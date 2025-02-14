@@ -1,0 +1,44 @@
+body{
+    background-color:gray;
+    /* margin: 30px; */
+    height: 100vh;
+  }
+  
+  .visible{
+    background-color: aquamarine;
+  }
+
+  .messageDisplay{
+    height: 80vh;
+    width: 60vw;
+    background-color: darkgray;
+    border: 2px solid black;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .centeredContainer{
+    margin: auto;
+    width: max-content;
+  }
+
+  /* first row */
+  .centeredContainer > :nth-child(1){
+    margin-bottom: 20px;
+  }
+
+
+  .formControlContainer{
+    display: flex;
+    flex-direction: row;
+    height: 40px;
+  }
+
+  /* send button */
+  .formControlContainer > :nth-child(2){
+    margin-left: 10px;
+    width: 95px;
+  }
+
+  

@@ -1,0 +1,42 @@
+.messageContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    padding: 10px 20px;
+    border-radius: 17px;
+    width: max-content;
+    font-size: 120%;
+    margin: 5px;
+    max-width: 310px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+
+.usersMessageContainer {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.othersMessageContainer {
+    align-self: flex-start;
+    align-items: flex-start;
+}
+
+.usersMessageContainer .senderName {
+    margin-right: 15px;
+}
+
+.othersMessageContainer .senderName {
+    margin-left: 15px;
+}
+
+.usersMessageContainer .message {
+    background-color: deepskyblue;
+}
+
+.othersMessageContainer .message {
+    background-color: lightgray;
+}
