@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { useWebSocket } from './WebSocketProvider';
 import MessageDisplay from './MessageDisplay';
-
+import '../style/ChatDisplay.css';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -64,16 +64,26 @@ export default function ChatDisplay() {
   
   return (
     <>
-    <Container className='centeredContainer' fluid >
-        <Row>
-            <Col>
+    <Container style={{ maxWidth: '60vw', height: '80vh', marginTop: '1.2rem'}}>
+        <Row style={{ height: '100%', marginBottom: '1.2rem' }}>
+            <Col style={{ height: '100%' }}>
               <MessageDisplay messages={messages} />
             </Col>
         </Row>
         <Row>
-            <Col className='formControlContainer'>
-                <Form.Control type='text' id="inputMessage" value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />
-                <Button onClick={handleMessageSend}>Send <FontAwesomeIcon icon={faPaperPlane} /></Button>
+            <Col>
+              <Form.Control 
+                className="bg-secondary text-white" 
+                type='text' 
+                id="inputMessage" 
+                value={inputMessage} 
+                onChange={(e) => setInputMessage(e.target.value)} 
+              />
+            </Col>
+            <Col xs={1} className='p-0'>
+              <Button className="d-flex align-items-center" onClick={handleMessageSend}>
+                Send <FontAwesomeIcon icon={faPaperPlane} className="ms-2" />
+              </Button>
             </Col>
         </Row>
     </Container>
