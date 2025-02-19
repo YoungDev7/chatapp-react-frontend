@@ -1,14 +1,19 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react'
-import { Nav } from 'react-bootstrap';
+import { Container, Nav, Navbar } from 'react-bootstrap';
 import '../style/Sidebar.css';
 
 export default function Sidebar() {
   return (
-    <div className='sidebar bg-dark'>
-      <Nav className='flex-column'>
-        <Nav.Link href='/'>Chat</Nav.Link>
-      </Nav>
-    </div>
+    <Navbar bg='dark' >
+      <Container>
+        <Navbar.Toggle aria-controls='basic-navbar-nav' />
+        <Navbar.Collapse id='basic-navbar-nav'>
+          <Nav className='vh-100 p-3 flex-column w-100' variant='pills' defaultActiveKey="/">
+            <Nav.Link className='text-white' href='/'>Chat</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   )
 }
