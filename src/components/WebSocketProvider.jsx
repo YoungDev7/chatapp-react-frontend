@@ -15,6 +15,7 @@ export default function WebSocketProvider({ children }) {
 
     useEffect(() => {
         // Create a new STOMP client
+        //TODO: implement token verification when starting connection
         const client = new Client({
             webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
             connectHeaders: {},
