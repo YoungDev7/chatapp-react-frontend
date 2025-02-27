@@ -39,7 +39,7 @@ export default function AuthProvider({ children }) {
     //tree to make sure they dont trigger requests without correct auth headers
     useLayoutEffect(() => {
         const interceptor = api.interceptors.request.use((config) => {
-            if(!config._retry && token){
+            if(!config._retry && !config.skipAuthInterceptor && token){
                 config.headers.Authorization = `Bearer ${token}`;
             } //else config.headers.Authorization remains the same
             return config;
