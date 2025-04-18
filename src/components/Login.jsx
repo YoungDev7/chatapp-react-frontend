@@ -1,11 +1,11 @@
 import { useState } from 'react';
+import { Button, Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthProvider';
 import api from '../services/Api';
-import { Form, Button, Container } from 'react-bootstrap';
+import { useAuth } from './AuthProvider';
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const { setToken } = useAuth();
   const navigate = useNavigate();
 
@@ -13,8 +13,8 @@ export default function Login() {
     e.preventDefault();
     try {
       // Send login request to the server, implicitly skipping the auth interceptor
-      const response = await api.post('/Auth/login', credentials, {skipAuthInterceptor: true});
-      setToken(response.data.accessToken);
+      const response = await api.post('/auth/authenticate', credentials, {skipAuthInterceptor: true});
+      setToken(response.data.access_token);
       navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
@@ -26,13 +26,13 @@ export default function Login() {
     <Container className="mt-5 w-50 bg-dark p-5 rounded">
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
-          <Form.Label className='text-white'>Username</Form.Label>
+          <Form.Label className='text-white'>email</Form.Label>
           <Form.Control
             type="text"
-            value={credentials.username}
+            value={credentials.email}
             onChange={(e) => setCredentials({
               ...credentials,
-              username: e.target.value
+              email: e.target.value
             })}
           />
         </Form.Group>

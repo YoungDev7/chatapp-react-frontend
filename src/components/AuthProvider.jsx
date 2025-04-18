@@ -16,22 +16,34 @@ export const useAuth = () => {
 
 // eslint-disable-next-line react/prop-types
 export default function AuthProvider({ children }) {
-    const [token, setToken] = useState(); //default value is undefined which means we still havent fetched the token
-    // TODO: research best place where to store token
+    const [token, setTokenState] = useState(() => {
+        return localStorage.getItem('accessToken') || undefined;
+    }); //default value is undefined which means we still havent validated the token
     
-    //fetch access token from the server 
+    const setToken = (newToken) => {
+        if (newToken) {
+            localStorage.setItem('accessToken', newToken);
+        } else {
+            localStorage.removeItem('accessToken');
+        }
+        setTokenState(newToken);
+    };
+    
+
     useEffect(() => {
-        const fetchToken = async () => {
-            try {
-                const response = await api.get('/Auth');
-                setToken(response.data.accessToken);
-            }catch {
-                setToken(null); //set token to null if token wasnt returned
+        const validateToken = async () => {
+            if(localStorage.getItem('accessToken')){
+                const response = await api.get('/auth/validateToken');
+                if(response.status !== 200 && response.data.message !== "valid"){
+                    setToken(null); //set token to null if token is invalid
+                    return;
+                }   
+            }else {
+                setToken(null); //set token to null if token is not present
             }
         };
 
-        fetchToken();
-
+        validateToken();
     }, []);
 
     //this interceptor is adding access token to headers until the token is expired
@@ -42,6 +54,7 @@ export default function AuthProvider({ children }) {
             if(!config._retry && !config.skipAuthInterceptor && token){
                 config.headers.Authorization = `Bearer ${token}`;
             } //else config.headers.Authorization remains the same
+            console.log("Interceptor added");
             return config;
         });
         return () => {
@@ -55,18 +68,17 @@ export default function AuthProvider({ children }) {
         const refreshInterceptor = api.interceptors.response.use((response) => response, async (error) => {
             const originalRequest = error.config;
             
-            //TODO: this if is specific to backend response which needs to be implemented in this way
-            if(error.response.status === 403 && error.response.data.message === "Unauthorized"  && !originalRequest._retry){
+            if(error.response.status === 401 && error.response.data.message === "Invalid token EXPIRED"  && !originalRequest._retry){
                 
                 originalRequest._retry = true; // Mark as retried before the attempt to prevent infinite loop
                 
                 //we send new request to the server to get new access token 
                 try{
-                    const response = await api.get('/refreshToken');
+                    const response = await api.get('/refresh');
                     
-                    setToken(response.data.accessToken);
+                    setToken(response.data.access_token);
 
-                    originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                    originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
 
                     //if successful then we retry the original request
                     return api(originalRequest);

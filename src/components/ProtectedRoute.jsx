@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children }) {
 
     if(token === undefined){
         //TODO: Add a loading spinner
-        return null;
+        return "loading...";
     }
 
     if(token === null){

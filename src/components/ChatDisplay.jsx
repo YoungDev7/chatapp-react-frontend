@@ -1,21 +1,22 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-import { useWebSocket } from './WebSocketProvider';
-import MessageDisplay from './MessageDisplay';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import api from '../services/Api';
 import '../style/ChatDisplay.css';
+import MessageDisplay from './MessageDisplay';
+import { useWebSocket } from './WebSocketProvider';
 
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 
 export default function ChatDisplay() {
-  const [inputMessage, setInputMessage] = useState('')
+  const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const stompClient = useWebSocket();
+  const { stompClient, connectionStatus } = useWebSocket(); // Destructure to get stompClient
 
   useEffect(() => {
     fetchMessages();
@@ -23,12 +24,10 @@ export default function ChatDisplay() {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/messages');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      const response = await api.get('/messages');
+      if (response.status === 200) {
+        setMessages(prevMessages => [...prevMessages, ...response.data]);
       }
-      const data = await response.json();
-      setMessages(prevMessages => [...prevMessages, ...data]);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -36,19 +35,19 @@ export default function ChatDisplay() {
 
   //websocket message handling
   useEffect(() => {
-    if (stompClient) {
+    if (stompClient && connectionStatus === 'connected') {
       const subscription = stompClient.subscribe('/topic/messages', (message) => {
         const newMessage = JSON.parse(message.body);
         setMessages(prevMessages => [...prevMessages, newMessage]);
       });
 
       return () => {
-        subscription.unsubscribe();
+        if (subscription) {
+          subscription.unsubscribe();
+        }
       };
     }
-  }, [stompClient]);
-
-
+  }, [stompClient, connectionStatus]);
 
   //SENDING MESSAGE
   function handleMessageSend() {
@@ -60,7 +59,6 @@ export default function ChatDisplay() {
       setInputMessage('');
     }
   }
-  
   
   return (
     <>
@@ -78,7 +76,7 @@ export default function ChatDisplay() {
                 id="inputMessage" 
                 value={inputMessage} 
                 onChange={(e) => setInputMessage(e.target.value)} 
-              />
+                              />
             </Col>
             <Col xs={1} className='p-0'>
               <Button className="d-flex align-items-center" onClick={handleMessageSend}>
@@ -86,7 +84,7 @@ export default function ChatDisplay() {
               </Button>
             </Col>
         </Row>
-    </Container>
+            </Container>
     </>
   )
 }
