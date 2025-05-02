@@ -27,7 +27,7 @@ export default function WebSocketProvider({ children }) {
         
         // Create a new STOMP client
         const client = new Client({
-            webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=${encodeURIComponent(token)}`),
+            webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=Bearer ${encodeURIComponent(token)}`),
             connectHeaders: {
                 Authorization: `Bearer ${token}`,  // Keep for STOMP protocol after connection
             },

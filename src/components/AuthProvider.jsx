@@ -17,14 +17,16 @@ export const useAuth = () => {
 // eslint-disable-next-line react/prop-types
 export default function AuthProvider({ children }) {
     const [token, setTokenState] = useState(() => {
-        return localStorage.getItem('accessToken') || undefined;
-    }); //default value is undefined which means we still havent validated the token
+        return localStorage.getItem('accessToken');
+    });
     
     const setToken = (newToken) => {
         if (newToken) {
             localStorage.setItem('accessToken', newToken);
+            console.log("Token set to local storage" + newToken);
         } else {
             localStorage.removeItem('accessToken');
+            console.log("remove token" + newToken);
         }
         setTokenState(newToken);
     };
@@ -36,6 +38,7 @@ export default function AuthProvider({ children }) {
                 const response = await api.get('/auth/validateToken');
                 if(response.status !== 200 && response.data.message !== "valid"){
                     setToken(null); //set token to null if token is invalid
+                    console.log("Token is invalid");
                     return;
                 }   
             }else {
@@ -74,7 +77,7 @@ export default function AuthProvider({ children }) {
                 
                 //we send new request to the server to get new access token 
                 try{
-                    const response = await api.get('/refresh');
+                    const response = await api.get('/auth/refresh');
                     
                     setToken(response.data.access_token);
 
