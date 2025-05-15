@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import api from '../services/Api';
 
 const AuthContext = createContext(null);
@@ -23,30 +23,17 @@ export default function AuthProvider({ children }) {
     const setToken = (newToken) => {
         if (newToken) {
             localStorage.setItem('accessToken', newToken);
-            console.log("Token set to local storage" + newToken);
         } else {
             localStorage.removeItem('accessToken');
-            console.log("remove token" + newToken);
         }
         setTokenState(newToken);
     };
     
 
     useEffect(() => {
-        const validateToken = async () => {
-            if(localStorage.getItem('accessToken')){
-                const response = await api.get('/auth/validateToken');
-                if(response.status !== 200 && response.data.message !== "valid"){
-                    setToken(null); //set token to null if token is invalid
-                    console.log("Token is invalid");
-                    return;
-                }   
-            }else {
-                setToken(null); //set token to null if token is not present
-            }
-        };
+        
 
-        validateToken();
+        
     }, []);
 
     //this interceptor is adding access token to headers until the token is expired
@@ -57,7 +44,7 @@ export default function AuthProvider({ children }) {
             if(!config._retry && !config.skipAuthInterceptor && token){
                 config.headers.Authorization = `Bearer ${token}`;
             } //else config.headers.Authorization remains the same
-            console.log("Interceptor added");
+
             return config;
         });
         return () => {
@@ -68,11 +55,53 @@ export default function AuthProvider({ children }) {
     //this interceptor is checking if response from the server is that access token is expired 
     //reference: flowchart_error_handling.png in doc
     useLayoutEffect(() => {
+
+        //DEBUG, expired token
+        setToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWtlaG9ja0BlbWFpbC5jb20iLCJpYXQiOjE3NDQ3MTM5MDEsImV4cCI6MTc0NDcxNzUwMX0.zbCOJeHEFNNNEsvxKkA7w_AxpZ0en1yeSu4LmH5ysdA");
+
+        const validateToken = async () => {
+            try{
+                if(localStorage.getItem('accessToken')){
+                    const response = await api.get('/auth/validateToken');
+                    if(response.status !== 200 && response.data.message !== "valid"){
+                        setToken(null); //set token to null if token is invalid
+                        console.error("Token is invalid");
+                        return;
+                    }   
+                }else {
+                    setToken(null); //set token to null if token is not present
+                }
+            }catch (error){
+                console.error("Error validating token", error);
+                setToken(null); //set token to null if token is not present
+            }
+        };
+
+        // Small delay to ensure interceptor is set up first (next event loop)
+        setTimeout(() => {
+            validateToken();
+        }, 0);
+
         const refreshInterceptor = api.interceptors.response.use((response) => response, async (error) => {
+            console.debug("error response", error.response);
+            if(error.response.status === 401){
+                console.debug("status is 401");
+            }
+            if(error.response.data === "Invalid token EXPIRED"){
+                console.debug("token is expired");
+            }
+
+
             const originalRequest = error.config;
+
+            if(!originalRequest._retry){
+                console.debug("originalRequest is not retried");
+            }
             
-            if(error.response.status === 401 && error.response.data.message === "Invalid token EXPIRED"  && !originalRequest._retry){
+            //TODO: specific server replies should be stored in file as local variables or something like that 
+            if(error.response.status === 401 && error.response.data === "Invalid token EXPIRED"  && !originalRequest._retry){
                 
+                console.debug("Token expired, refreshing token");
                 originalRequest._retry = true; // Mark as retried before the attempt to prevent infinite loop
                 
                 //we send new request to the server to get new access token 
