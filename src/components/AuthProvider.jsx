@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-unused-vars
 import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import api from '../services/Api';
@@ -82,6 +83,7 @@ export default function AuthProvider({ children }) {
             validateToken();
         }, 0);
 
+        let pom = 0;
         const refreshInterceptor = api.interceptors.response.use((response) => response, async (error) => {
             console.debug("error response", error.response);
             if(error.response.status === 401){
@@ -98,9 +100,17 @@ export default function AuthProvider({ children }) {
                 console.debug("originalRequest is not retried");
             }
             
+            
+
             //TODO: specific server replies should be stored in file as local variables or something like that 
             if(error.response.status === 401 && error.response.data === "Invalid token EXPIRED"  && !originalRequest._retry){
                 
+                if(pom === 1){
+                    return Promise.reject(error);
+                }
+
+                pom = 1;
+
                 console.debug("Token expired, refreshing token");
                 originalRequest._retry = true; // Mark as retried before the attempt to prevent infinite loop
                 
