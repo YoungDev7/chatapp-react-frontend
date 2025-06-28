@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-unused-vars
-import { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { createContext, useContext, useLayoutEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/Api';
 
 const AuthContext = createContext(null);
@@ -17,6 +18,7 @@ export const useAuth = () => {
 
 // eslint-disable-next-line react/prop-types
 export default function AuthProvider({ children }) {
+    const navigate = useNavigate();
     const [token, setTokenState] = useState(() => {
         return localStorage.getItem('accessToken');
     });
@@ -31,11 +33,6 @@ export default function AuthProvider({ children }) {
     };
     
 
-    useEffect(() => {
-        
-
-        
-    }, []);
 
     //this interceptor is adding access token to headers until the token is expired
     //useLayoutEffect because we want to block rest of the rendering down the component
@@ -58,7 +55,7 @@ export default function AuthProvider({ children }) {
     useLayoutEffect(() => {
 
         //DEBUG, expired token
-        setToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWtlaG9ja0BlbWFpbC5jb20iLCJpYXQiOjE3NDQ3MTM5MDEsImV4cCI6MTc0NDcxNzUwMX0.zbCOJeHEFNNNEsvxKkA7w_AxpZ0en1yeSu4LmH5ysdA");
+        //setToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWtlaG9ja0BlbWFpbC5jb20iLCJpYXQiOjE3NDQ3MTM5MDEsImV4cCI6MTc0NDcxNzUwMX0.zbCOJeHEFNNNEsvxKkA7w_AxpZ0en1yeSu4LmH5ysdA");
 
         const validateToken = async () => {
             try{
@@ -83,7 +80,6 @@ export default function AuthProvider({ children }) {
             validateToken();
         }, 0);
 
-        let pom = 0;
         const refreshInterceptor = api.interceptors.response.use((response) => response, async (error) => {
             console.debug("error response", error.response);
             if(error.response.status === 401){
@@ -105,20 +101,17 @@ export default function AuthProvider({ children }) {
             //TODO: specific server replies should be stored in file as local variables or something like that 
             if(error.response.status === 401 && error.response.data === "Invalid token EXPIRED"  && !originalRequest._retry){
                 
-                if(pom === 1){
-                    return Promise.reject(error);
-                }
-
-                pom = 1;
-
                 console.debug("Token expired, refreshing token");
                 originalRequest._retry = true; // Mark as retried before the attempt to prevent infinite loop
                 
                 //we send new request to the server to get new access token 
                 try{
-                    const response = await api.get('/auth/refresh');
+                    const response = await api.post('/auth/refresh', {
+                        withCredentials: true // Ensures refresh cookie is sent
+                    });
                     
                     setToken(response.data.access_token);
+                    navigate('/');
 
                     originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
 
