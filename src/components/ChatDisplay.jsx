@@ -16,7 +16,7 @@ import Row from 'react-bootstrap/Row';
 export default function ChatDisplay() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const { stompClient, connectionStatus } = useWebSocket(); // Destructure to get stompClient
+  const { stompClient, connectionStatus } = useWebSocket(); 
 
   useEffect(() => {
     fetchMessages();
@@ -51,10 +51,10 @@ export default function ChatDisplay() {
 
   //SENDING MESSAGE
   function handleMessageSend() {
-    if (stompClient) {
+    if (stompClient && connectionStatus === 'connected') {
       stompClient.publish({
         destination: "/app/chat",
-        body: JSON.stringify({ text: inputMessage, sender: 'Mike' })
+        body: JSON.stringify({ text: inputMessage, sender: 'mike hock' })
       });
       setInputMessage('');
     }

@@ -5,10 +5,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { useAuth } from './AuthProvider';
 
-// Create a context for the WebSocket client
 const WebSocketContext = createContext(null);
 
-// Custom hook to use the WebSocket context
 export const useWebSocket = () => useContext(WebSocketContext);
 
 export default function WebSocketProvider({ children }) {
@@ -20,16 +18,18 @@ export default function WebSocketProvider({ children }) {
         if(!token) {
             console.log("cannot connect to websocket, token is null or undefined");
             setConnectionStatus('disconnected');
+            setStompClient(null);
             return;
         }
         
         setConnectionStatus('connecting');
+        setStompClient(null);
         
-        // Create a new STOMP client
+        // STOMP client
         const client = new Client({
             webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=Bearer ${encodeURIComponent(token)}`),
             connectHeaders: {
-                Authorization: `Bearer ${token}`,  // Keep for STOMP protocol after connection
+                Authorization: `Bearer ${token}`, 
             },
             debug: (str) => {
                 console.log(str);
@@ -39,18 +39,18 @@ export default function WebSocketProvider({ children }) {
             heartbeatOutgoing: 4000,
         });
 
-        // Add error handling
         client.onStompError = (frame) => {
             console.error('STOMP error:', frame);
             setConnectionStatus('error');
+            setStompClient(null);
         };
 
         client.onWebSocketError = (event) => {
             console.error('WebSocket error:', event);
             setConnectionStatus('error');
+            setStompClient(null);
         };
 
-        // Set the client on successful connection
         client.onConnect = () => {
             console.log('Connected to WebSocket');
             setConnectionStatus('connected');
@@ -60,17 +60,24 @@ export default function WebSocketProvider({ children }) {
         client.onDisconnect = () => {
             console.log('Disconnected from WebSocket');
             setConnectionStatus('disconnected');
+            setStompClient(null);
         };
 
-        // Activate the client
+        client.onWebSocketClose = () => {
+            console.log('WebSocket closed');
+            setConnectionStatus('disconnected');
+            setStompClient(null);
+        };
+
         client.activate();
 
-        // Cleanup function to deactivate the client on unmount
+        // Cleanup 
         return () => {
             if (client.active) {
                 client.deactivate();
             }
             setConnectionStatus('disconnected');
+            setStompClient(null);
         };
     }, [token]);
 
