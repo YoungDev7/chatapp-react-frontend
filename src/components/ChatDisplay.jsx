@@ -26,7 +26,7 @@ export default function ChatDisplay() {
     try {
       const response = await api.get('/messages');
       if (response.status === 200) {
-        setMessages(prevMessages => [...prevMessages, ...response.data]);
+        setMessages(response.data);
       }
     } catch (error) {
       console.error('Error fetching messages:', error);

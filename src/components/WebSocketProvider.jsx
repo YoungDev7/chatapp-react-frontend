@@ -2,8 +2,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Client } from '@stomp/stompjs';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import SockJS from 'sockjs-client';
-import { useAuth } from './AuthProvider';
 
 const WebSocketContext = createContext(null);
 
@@ -12,7 +12,7 @@ export const useWebSocket = () => useContext(WebSocketContext);
 export default function WebSocketProvider({ children }) {
     const [stompClient, setStompClient] = useState(null);
     const [connectionStatus, setConnectionStatus] = useState('disconnected'); // 'connecting', 'connected', 'disconnected', 'error'
-    const { token } = useAuth();
+    const { token } = useSelector(state => state.auth);
 
     useEffect(() => {
         if(!token) {
@@ -58,13 +58,13 @@ export default function WebSocketProvider({ children }) {
         };
         
         client.onDisconnect = () => {
-            console.log('Disconnected from WebSocket');
+            console.log('Disconnected from websocket');
             setConnectionStatus('disconnected');
             setStompClient(null);
         };
 
-        client.onWebSocketClose = () => {
-            console.log('WebSocket closed');
+        client.onWebSocketClose = (event) => {
+            console.log('WebSocket closed: ', event.code, event.reason);
             setConnectionStatus('disconnected');
             setStompClient(null);
         };

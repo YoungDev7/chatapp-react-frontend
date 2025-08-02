@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/Api';
-import { useAuth } from './AuthProvider';
+import { setToken } from '../store/slices/authSlice';
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const { setToken } = useAuth();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,7 +15,7 @@ export default function Login() {
     try {
       // Send login request to the server, implicitly skipping the auth interceptor
       const response = await api.post('/auth/authenticate', credentials, {skipAuthInterceptor: true});
-      setToken(response.data.access_token);
+      dispatch(setToken(response.data.access_token));
       navigate('/');
     } catch (error) {
       console.error('Login failed:', error);

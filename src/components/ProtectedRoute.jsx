@@ -1,13 +1,12 @@
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthProvider';
 
 // eslint-disable-next-line react/prop-types
 export default function ProtectedRoute({ children }) {
-    const { token } = useAuth();
+    const { token, isValidating } = useSelector(state => state.auth);
 
-    if(token === undefined){
-        //TODO: Add a loading spinner
-        return "loading...";
+    if (isValidating) {
+        return <div>Loading...</div>;
     }
 
     if(token === null){
