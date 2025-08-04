@@ -1,29 +1,26 @@
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
 import { Client } from '@stomp/stompjs';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import SockJS from 'sockjs-client';
+import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 
-const WebSocketContext = createContext(null);
-
-export const useWebSocket = () => useContext(WebSocketContext);
 
 export default function WebSocketProvider({ children }) {
-    const [stompClient, setStompClient] = useState(null);
-    const [connectionStatus, setConnectionStatus] = useState('disconnected'); // 'connecting', 'connected', 'disconnected', 'error'
+    const dispatch = useDispatch();
     const { token } = useSelector(state => state.auth);
 
     useEffect(() => {
         if(!token) {
             console.log("cannot connect to websocket, token is null or undefined");
-            setConnectionStatus('disconnected');
-            setStompClient(null);
+            dispatch(setConnectionStatus('disconnected'));
+            dispatch(setStompClient(null));
             return;
         }
         
-        setConnectionStatus('connecting');
-        setStompClient(null);
+        dispatch(setConnectionStatus('connecting'));
+        dispatch(setStompClient(null));
         
         // STOMP client
         const client = new Client({
@@ -41,32 +38,32 @@ export default function WebSocketProvider({ children }) {
 
         client.onStompError = (frame) => {
             console.error('STOMP error:', frame);
-            setConnectionStatus('error');
-            setStompClient(null);
+            dispatch(setConnectionStatus('error'));
+            dispatch(setStompClient(null));
         };
 
         client.onWebSocketError = (event) => {
             console.error('WebSocket error:', event);
-            setConnectionStatus('error');
-            setStompClient(null);
+            dispatch(setConnectionStatus('error'));
+            dispatch(setStompClient(null));
         };
 
         client.onConnect = () => {
             console.log('Connected to WebSocket');
-            setConnectionStatus('connected');
-            setStompClient(client);
+            dispatch(setConnectionStatus('connected'));
+            dispatch(setStompClient(client));
         };
         
         client.onDisconnect = () => {
             console.log('Disconnected from websocket');
-            setConnectionStatus('disconnected');
-            setStompClient(null);
+            dispatch(setConnectionStatus('disconnected'));
+            dispatch(setStompClient(null));
         };
 
         client.onWebSocketClose = (event) => {
             console.log('WebSocket closed: ', event.code, event.reason);
-            setConnectionStatus('disconnected');
-            setStompClient(null);
+            dispatch(setConnectionStatus('disconnected'));
+            dispatch(setStompClient(null));
         };
 
         client.activate();
@@ -76,16 +73,11 @@ export default function WebSocketProvider({ children }) {
             if (client.active) {
                 client.deactivate();
             }
-            setConnectionStatus('disconnected');
-            setStompClient(null);
+            dispatch(setConnectionStatus('disconnected'));
+            dispatch(setStompClient(null));
         };
     }, [token]);
 
-    // Provide the WebSocket client and connection status to children components
-    return (
-        <WebSocketContext.Provider value={{ stompClient, connectionStatus }}>
-            {children}
-        </WebSocketContext.Provider>
-    );
+    return children;
 }
 

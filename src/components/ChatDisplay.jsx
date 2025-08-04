@@ -2,10 +2,10 @@
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import api from '../services/Api';
 import '../style/ChatDisplay.css';
 import MessageDisplay from './MessageDisplay';
-import { useWebSocket } from './WebSocketProvider';
 
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
@@ -16,7 +16,7 @@ import Row from 'react-bootstrap/Row';
 export default function ChatDisplay() {
   const [inputMessage, setInputMessage] = useState('');
   const [messages, setMessages] = useState([]);
-  const { stompClient, connectionStatus } = useWebSocket(); 
+  const { stompClient, connectionStatus } = useSelector(state => state.ws); 
 
   useEffect(() => {
     fetchMessages();
