@@ -1,32 +1,32 @@
 /* eslint-disable no-unused-vars */
-import { Routes, Route, Outlet } from 'react-router-dom';
-import ChatDisplay from './components/ChatDisplay';
-import WebSocketProvider from './components/WebSocketProvider';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Outlet, Route, Routes } from 'react-router-dom';
+import AuthHandler from './components/auth/AuthHandler';
+import Login from './components/auth/Login';
+import ChatView from './components/chat/ChatView';
 import Layout from './components/Layout';
-import AuthProvider from './components/AuthProvider';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './components/Login';
+import WebSocketHandler from './components/WebSocketHandler';
 
 function App() {
   return (
-    <AuthProvider> {/*provides acces to token and handles token auth*/}
+    <AuthHandler> {/*provides acces to token and handles token auth*/}
       <Routes>
         <Route path="/login" element={<Login />} /> {/* login page where user gets redirected if not authorized */}
         <Route element={
           <ProtectedRoute>
-            <WebSocketProvider>
+            <WebSocketHandler>
               <Layout>
                 <Outlet /> {/* child components, all child components are nested inside of ProtectedRoute => SocketProvider => Layout*/}
               </Layout>
-            </WebSocketProvider>
+            </WebSocketHandler>
           </ProtectedRoute>
         }>
           {/*here are child components to be rendered inside of outlet */}
-          <Route path="/" element={<ChatDisplay />} /> 
+          <Route path="/" element={<ChatView />} /> 
         </Route>
       </Routes>
-    </AuthProvider>
+    </AuthHandler>
   );
 }
 

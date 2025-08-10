@@ -3,12 +3,12 @@
 import { useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/Api';
-import { setToken, setUser, validateToken } from '../store/slices/authSlice';
+import api from '../../services/Api';
+import { setToken, setUser, validateToken } from '../../store/slices/authSlice';
 
 
 // eslint-disable-next-line react/prop-types
-export default function AuthProvider({ children }) {
+export default function AuthHandler ({ children }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { token, isValidating } = useSelector(state => state.auth);

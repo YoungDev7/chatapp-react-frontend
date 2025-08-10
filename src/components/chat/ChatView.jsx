@@ -2,10 +2,10 @@
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import api from '../services/Api';
-import '../style/ChatDisplay.css';
-import MessageDisplay from './MessageDisplay';
+import { useDispatch, useSelector } from 'react-redux';
+import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
+import '../../style/ChatView.css';
+import MessageContainer from './MessageContainer';
 
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
@@ -13,32 +13,34 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 
-export default function ChatDisplay() {
+export default function ChatView() {
   const [inputMessage, setInputMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const { stompClient, connectionStatus } = useSelector(state => state.ws); 
+  const { chatViewCollection } = useSelector(state => state.chatView); // !not working 
+  const { stompClient, connectionStatus } = useSelector(state => state.ws);
+  const { user } = useSelector(state => state.auth); 
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    fetchMessages();
+    dispatch(fetchMessages());
   }, []);
 
-  const fetchMessages = async () => {
-    try {
-      const response = await api.get('/messages');
-      if (response.status === 200) {
-        setMessages(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
+  // const fetchMessages = async () => {
+  //   try {
+  //     const response = await api.get('/messages');
+  //     if (response.status === 200) {
+  //       dispatch(setMessages(response.data));
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching messages:', error);
+  //   }
+  // };
 
   //websocket message handling
   useEffect(() => {
     if (stompClient && connectionStatus === 'connected') {
       const subscription = stompClient.subscribe('/topic/messages', (message) => {
         const newMessage = JSON.parse(message.body);
-        setMessages(prevMessages => [...prevMessages, newMessage]);
+        dispatch(addMessage(newMessage));
       });
 
       return () => {
@@ -54,7 +56,7 @@ export default function ChatDisplay() {
     if (stompClient && connectionStatus === 'connected') {
       stompClient.publish({
         destination: "/app/chat",
-        body: JSON.stringify({ text: inputMessage, sender: 'mike hock' })
+        body: JSON.stringify({ text: inputMessage, sender: user.name })
       });
       setInputMessage('');
     }
@@ -65,7 +67,7 @@ export default function ChatDisplay() {
     <Container style={{ maxWidth: '60vw', height: '80vh', marginTop: '1.2rem'}}>
         <Row style={{ height: '100%', marginBottom: '1.2rem' }}>
             <Col style={{ height: '100%' }}>
-              <MessageDisplay messages={messages} />
+              <MessageContainer messages={chatViewCollection[0].messages} />
             </Col>
         </Row>
         <Row>

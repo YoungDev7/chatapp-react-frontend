@@ -7,7 +7,7 @@ import SockJS from 'sockjs-client';
 import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 
 
-export default function WebSocketProvider({ children }) {
+export default function WebSocketHandler({ children }) {
     const dispatch = useDispatch();
     const { token } = useSelector(state => state.auth);
 

@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-import React from 'react'
-import '../style/ChatMessage.css'
+import '../../style/ChatMessage.css'
 
 export default function ChatMessage({sender, text, isUser}) {
 

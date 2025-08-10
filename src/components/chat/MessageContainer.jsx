@@ -1,10 +1,10 @@
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import '../../style/MessageContainer.css';
 import ChatMessage from './ChatMessage';
-import '../style/MessageDisplay.css';
 
-const MessageDisplay = ({ messages }) => {
+const MessageContainer = ({ messages }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -21,4 +21,4 @@ const MessageDisplay = ({ messages }) => {
   );
 };
 
-export default MessageDisplay;
+export default MessageContainer;
