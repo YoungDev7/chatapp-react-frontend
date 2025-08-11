@@ -3,7 +3,7 @@ import { Button, Container, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
-import { setToken } from '../../store/slices/authSlice';
+import { setToken, setUser } from '../../store/slices/authSlice';
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
@@ -16,6 +16,7 @@ export default function Login() {
       // Send login request to the server, implicitly skipping the auth interceptor
       const response = await api.post('/auth/authenticate', credentials, {skipAuthInterceptor: true});
       dispatch(setToken(response.data.access_token));
+      dispatch(setUser(response.data.access_token));
       navigate('/');
     } catch (error) {
       console.error('Login failed:', error);

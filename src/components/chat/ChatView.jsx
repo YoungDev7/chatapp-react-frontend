@@ -15,7 +15,7 @@ import Row from 'react-bootstrap/Row';
 
 export default function ChatView() {
   const [inputMessage, setInputMessage] = useState('');
-  const { chatViewCollection } = useSelector(state => state.chatView); // !not working 
+  const { chatViewCollection } = useSelector(state => state.chatView);
   const { stompClient, connectionStatus } = useSelector(state => state.ws);
   const { user } = useSelector(state => state.auth); 
   const dispatch = useDispatch();
@@ -23,17 +23,6 @@ export default function ChatView() {
   useEffect(() => {
     dispatch(fetchMessages());
   }, []);
-
-  // const fetchMessages = async () => {
-  //   try {
-  //     const response = await api.get('/messages');
-  //     if (response.status === 200) {
-  //       dispatch(setMessages(response.data));
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching messages:', error);
-  //   }
-  // };
 
   //websocket message handling
   useEffect(() => {
@@ -56,7 +45,7 @@ export default function ChatView() {
     if (stompClient && connectionStatus === 'connected') {
       stompClient.publish({
         destination: "/app/chat",
-        body: JSON.stringify({ text: inputMessage, sender: user.name })
+        body: JSON.stringify({ text: inputMessage, sender: user.name, senderUid: user.uid })
       });
       setInputMessage('');
     }
