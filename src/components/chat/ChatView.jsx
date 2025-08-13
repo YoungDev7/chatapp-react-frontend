@@ -75,7 +75,7 @@ export default function ChatView() {
               </Button>
             </Col>
         </Row>
-            </Container>
+    </Container>
     </>
   )
 }

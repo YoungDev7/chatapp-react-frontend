@@ -35,10 +35,6 @@ export default function AuthHandler ({ children }) {
     //reference: flowchart_error_handling.png in doc
     // EXPIRED TOKEN INTERCEPTOR AND VALIDATION
     useLayoutEffect(() => {
-
-        //DEBUG, expired token
-        //setToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWtlaG9ja0BlbWFpbC5jb20iLCJpYXQiOjE3NDQ3MTM5MDEsImV4cCI6MTc0NDcxNzUwMX0.zbCOJeHEFNNNEsvxKkA7w_AxpZ0en1yeSu4LmH5ysdA");
-
         // Small delay to ensure interceptor is set up first (next event loop)
         setTimeout(() => {
             dispatch(validateToken());
