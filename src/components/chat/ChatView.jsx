@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
-import '../../style/ChatView.css';
 import MessageContainer from './MessageContainer';
 
 import Button from 'react-bootstrap/Button';
@@ -70,7 +69,7 @@ export default function ChatView() {
                               />
             </Col>
             <Col xs={1} className='p-0'>
-              <Button className="d-flex align-items-center" onClick={handleMessageSend}>
+              <Button className="d-flex align-items-center" type="submit" onClick={handleMessageSend}>
                 Send <FontAwesomeIcon icon={faPaperPlane} className="ms-2" />
               </Button>
             </Col>

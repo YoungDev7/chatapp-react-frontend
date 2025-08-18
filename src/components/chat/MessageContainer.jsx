@@ -2,7 +2,6 @@
 // eslint-disable-next-line no-unused-vars
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import '../../style/MessageContainer.css';
 import ChatMessage from './ChatMessage';
 
 const MessageContainer = ({ messages }) => {

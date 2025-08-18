@@ -25,7 +25,7 @@ export default function Login() {
   };
 
   return (
-    <Container className="mt-5 w-50 bg-dark p-5 rounded">
+    <Container className="mt-5 w-25 bg-dark p-5 rounded">
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label className='text-white'>email</Form.Label>
@@ -51,7 +51,11 @@ export default function Login() {
           />
         </Form.Group>
 
-        <Button type="submit">Login</Button>
+        <Button className='w-100 mt-3' type="submit">Login</Button>
+
+        <hr className="border border-3 border-dark-subtle" />
+
+        <div className='text-white'>dont have an account? <a className='text-primary text-primary-hover text-decoration-underline' href="/register">Register now</a> </div>
       </Form>
     </Container>
   )
