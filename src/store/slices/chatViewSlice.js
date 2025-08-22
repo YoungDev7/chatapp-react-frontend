@@ -4,19 +4,17 @@ import api from '../../services/Api';
 
 export const fetchMessages = createAsyncThunk(
     'chatView/fetchMessages',
-  async (/*chatViewID*/) => {
+  async (_, /*chatViewID,*/ { rejectWithValue }) => {
     try {
       const response = await api.get('/messages');
-      if (response.status === 200) {
-        return response.data;
-        // return { 
-        //   viewId: chatViewID, 
-        //   messages: response.data 
-        // };
-      }
+      return response.data;
+      // return { 
+      //   viewId: chatViewID, 
+      //   messages: response.data 
+      // };
     } catch (error) {
       console.error('Error fetching messages:', error);
-      throw error;
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );

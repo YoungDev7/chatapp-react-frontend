@@ -16,7 +16,7 @@ const MessageContainer = ({ messages }) => {
   return (
     <div className="bg-secondary border border-dark border-2 d-flex flex-column overflow-auto" ref={containerRef} style={{ height: '100%' }}>
       {messages.map((message) => (
-        <ChatMessage key={message.id} text={message.text} sender={message.sender} isUser={ message.senderUid === user.uid ? true : false } />
+        <ChatMessage key={message.id} text={message.text} sender={message.sender.name} isUser={ message.sender.uid === user.uid ? true : false } />
       ))}
     </div>
   );

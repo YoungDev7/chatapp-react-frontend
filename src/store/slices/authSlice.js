@@ -7,13 +7,18 @@ import api from '../../services/Api';
 
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
-  async () => {
+  async (_, { rejectWithValue }) => {
     try {
-      if (localStorage.getItem('accessToken')) {
-        const response = await api.get('/auth/validateToken');
+      if (!localStorage.getItem('accessToken')) {
+        throw new Error("no token found in localstorage");
       }
+      
+      const response = await api.get('/auth/validateToken');
+      return response.data;
+
     } catch (error) {
       console.error("Error validating token", error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
