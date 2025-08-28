@@ -4,6 +4,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Buffer } from 'buffer';
 import api from '../../services/Api';
 
+//right now: handlelogout needs to navigate to logout in its body
+
 
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
@@ -23,6 +25,20 @@ export const validateToken = createAsyncThunk(
   }
 );
 
+export const handleLogout = createAsyncThunk(
+  'auth/handleLogout',
+  async(_, {dispatch} ) =>{
+    
+    try{
+      await api.post('/auth/logout');
+      dispatch(clearAuth());
+    }catch(error){
+      console.error("logout error: " + error);
+      dispatch(clearAuth());
+    }
+}
+);
+
 const parseJWT = (token) => {
   try {
     const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'));
@@ -34,6 +50,29 @@ const parseJWT = (token) => {
   } catch (error) {
     throw new Error("Error parsing JWT token ", error);
   }
+};
+
+// Helper function to update user from token
+const updateUserFromToken = (state, token) => {
+  if (token) {
+    try {
+      state.user = parseJWT(token);
+    } catch (error) {
+      console.error(error);
+      state.user = { email: null, name: null, uid: null };
+    }
+  } else {
+    state.user = { email: null, name: null, uid: null };
+  }
+};
+
+// Helper function to clear authentication state
+const clearAuthState = (state) => {
+  console.debug("reached");
+  state.token = null;
+  state.user = { email: null, name: null, uid: null };
+  state.isValidating = false;
+  localStorage.removeItem('accessToken');
 };
 
 const authSlice = createSlice({
@@ -59,25 +98,14 @@ const authSlice = createSlice({
       }
     },
     clearAuth: (state) => {
-      state.token = null;
-      state.user = { email: null, name: null, uid: null };
-      state.isValidating = false;
-      localStorage.removeItem('accessToken');
+      clearAuthState(state);
     },
     setValidating: (state, action) => {
       state.isValidating = action.payload;
     },
-    setUser(state, action) {
+    setUser: (state, action) => {
       const token = action.payload;
-      if(token) {
-        try{
-          state.user = parseJWT(token);
-        }catch (error){
-          console.error(error);
-        }
-      }else {
-        state.user = { email: null, name: null, uid: null };
-      }
+      updateUserFromToken(state, token);
     },
   },
   extraReducers: (builder) => {
@@ -87,19 +115,10 @@ const authSlice = createSlice({
       })
       .addCase(validateToken.fulfilled, (state) => {
         state.isValidating = false;
-        if(state.token) {
-          try{
-            state.user = parseJWT(state.token);
-          }catch (error){
-            console.error(error);
-          }
-        }
+        updateUserFromToken(state, state.token);
       })
       .addCase(validateToken.rejected, (state, action) => {
-        state.token = null;
-        state.user = { email: null, name: null, uid: null };
-        state.isValidating = false;
-        localStorage.removeItem('accessToken');
+        clearAuthState(state);
       })
   }
 });
