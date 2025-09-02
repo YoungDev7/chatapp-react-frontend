@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import AuthHandler from './components/auth/AuthHandler';
 import Login from './components/auth/Login';
-import Logout from './components/auth/Logout';
 import Register from './components/auth/Register';
 import ChatView from './components/chat/ChatView';
 import Layout from './components/Layout';
@@ -15,7 +14,6 @@ function App() {
     <AuthHandler> {/*provides acces to token and handles token auth*/}
       <Routes>
         <Route path="/login" element={<Login />} /> {/* login page where user gets redirected if not authorized */}
-        <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<Register />} />
         <Route element={
           <ProtectedRoute>

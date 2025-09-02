@@ -4,9 +4,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Buffer } from 'buffer';
 import api from '../../services/Api';
 
-//right now: handlelogout needs to navigate to logout in its body
-
-
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
   async (_, { rejectWithValue }) => {
