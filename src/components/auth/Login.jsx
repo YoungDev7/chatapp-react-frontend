@@ -5,6 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
 import { setToken, setUser } from '../../store/slices/authSlice';
 
+/**
+ * Login component that handles user authentication.
+ * 
+ * Provides a login form with email and password fields. On successful authentication,
+ * stores the access token and user data in Redux state and navigates to the home page.
+ * The authentication request bypasses the auth interceptor since no token is available yet.
+ * 
+ * @returns {React.ReactElement} Login form component
+ */
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const dispatch = useDispatch();

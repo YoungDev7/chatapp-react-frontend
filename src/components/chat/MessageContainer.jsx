@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChatMessage from './ChatMessage';
 
+//this component is container in which all messages are rendered
 const MessageContainer = ({ messages }) => {
   const containerRef = useRef(null);
   const { user } = useSelector(state => state.auth); 

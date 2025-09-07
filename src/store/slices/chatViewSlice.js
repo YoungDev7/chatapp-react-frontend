@@ -1,7 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/Api';
 
-
+/**
+ * Async thunk to fetch messages from the API.
+ * Currently fetches all messages but is designed to support fetching messages for specific chat views.
+ * 
+ * @async
+ * @function fetchMessages
+ * @param {*} _ - Unused parameter (placeholder for future chatViewID parameter)
+ * @param {Object} thunkAPI - Redux Toolkit thunk API object
+ * @param {Function} thunkAPI.rejectWithValue - Function to return rejected value on error
+ * @returns {Promise<Array>} Promise that resolves to array of message objects
+ * @throws {Object} Returns rejected value with error data or message
+ */
 export const fetchMessages = createAsyncThunk(
     'chatView/fetchMessages',
   async (_, /*chatViewID,*/ { rejectWithValue }) => {
@@ -33,6 +44,13 @@ const fetchChatViews = createAsyncThunk(
   }
 )
 
+/**
+ * Redux slice for managing chat view state.
+ * Handles a collection of chat views, each containing messages, loading state, and error state.
+ * Currently operates primarily on the first chat view (index 0) but is structured to support multiple views.
+ * 
+ * @namespace chatViewSlice
+ */
 const chatViewSlice = createSlice({
     name: 'chatView',
     initialState: {

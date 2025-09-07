@@ -4,6 +4,15 @@ import { useDispatch } from 'react-redux';
 import { handleLogout } from '../store/slices/authSlice';
 import '../style/Sidebar.css';
 
+/**
+ * Sidebar component that provides navigation and user actions.
+ * 
+ * Contains navigation links for the application and a logout button.
+ * The logout functionality dispatches a logout action to clear user session
+ * and authentication state.
+ * 
+ * @returns {React.ReactElement} Sidebar navigation component
+ */
 export default function Sidebar() {
   const dispatch = useDispatch();
 

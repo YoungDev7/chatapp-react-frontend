@@ -7,6 +7,22 @@ import SockJS from 'sockjs-client';
 import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 
 
+/**
+ * WebSocketHandler component that manages WebSocket connection lifecycle.
+ * 
+ * This component:
+ * - Establishes STOMP WebSocket connection when authenticated
+ * - Handles connection states (connecting, connected, disconnected, error)
+ * - Automatically reconnects on connection loss
+ * - Includes authentication token in connection headers
+ * - Manages connection cleanup on component unmount or token changes
+ * 
+ * The WebSocket connection is only established when a valid authentication token exists.
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to render
+ * @returns {React.ReactNode} The child components
+ */
 export default function WebSocketHandler({ children }) {
     const dispatch = useDispatch();
     const { token } = useSelector(state => state.auth);

@@ -12,6 +12,20 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 
+/**
+ * ChatView component that displays the main chat interface.
+ * 
+ * This component handles:
+ * - Fetching and displaying chat messages
+ * - Real-time message updates via WebSocket subscription
+ * - Sending new messages through STOMP client
+ * - Message input and send functionality
+ * 
+ * The component subscribes to '/topic/messages' for real-time updates and publishes
+ * messages to '/app/chat' when sending new messages.
+ * 
+ * @returns {React.ReactElement} Chat interface with message display and input
+ */
 export default function ChatView() {
   const [inputMessage, setInputMessage] = useState('');
   const { chatViewCollection } = useSelector(state => state.chatView);

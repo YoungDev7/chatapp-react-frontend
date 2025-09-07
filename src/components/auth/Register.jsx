@@ -2,6 +2,23 @@ import { useState } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import api from '../../services/Api';
 
+/**
+ * Register component that handles user registration.
+ * 
+ * Provides a registration form with validation for:
+ * - Username, email, password, and password confirmation fields
+ * - Password matching validation
+ * - Form submission with success/error feedback
+ * 
+ * The component displays different states:
+ * - Registration form (initial state)
+ * - Loading state during submission
+ * - Success/error feedback after submission
+ * 
+ * Registration requests bypass the auth interceptor since no token is available yet.
+ * 
+ * @returns {React.ReactElement} Registration form or feedback component
+ */
 export default function Register() {
     const [ isSubmitted, setIsSubmitted ] = useState(false);
     const [ isRegistrationSuccess, setIsRegistrationSuccess ] = useState(null);

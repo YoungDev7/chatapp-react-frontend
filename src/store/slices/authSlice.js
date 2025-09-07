@@ -4,6 +4,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Buffer } from 'buffer';
 import api from '../../services/Api';
 
+/**
+ * Async thunk to validate the current authentication token.
+ * 
+ * Checks if a token exists in localStorage and validates it with the server.
+ * Used during app initialization to verify existing authentication state.
+ * 
+ * @returns {Promise} Promise resolving to validation result or rejection with error
+ */
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
   async (_, { rejectWithValue }) => {
@@ -22,6 +30,14 @@ export const validateToken = createAsyncThunk(
   }
 );
 
+/**
+ * Async thunk to handle user logout.
+ * 
+ * Sends logout request to server and clears authentication state.
+ * Ensures cleanup even if server request fails.
+ * 
+ * @returns {Promise} Promise that always clears auth state regardless of server response
+ */
 export const handleLogout = createAsyncThunk(
   'auth/handleLogout',
   async(_, {dispatch} ) =>{
@@ -49,7 +65,7 @@ const parseJWT = (token) => {
   }
 };
 
-// Helper function to update user from token
+
 const updateUserFromToken = (state, token) => {
   if (token) {
     try {
@@ -63,7 +79,6 @@ const updateUserFromToken = (state, token) => {
   }
 };
 
-// Helper function to clear authentication state
 const clearAuthState = (state) => {
   console.debug("reached");
   state.token = null;
@@ -72,6 +87,22 @@ const clearAuthState = (state) => {
   localStorage.removeItem('accessToken');
 };
 
+/**
+ * Authentication slice for managing user authentication state.
+ * 
+ * Manages:
+ * - JWT access token storage and persistence
+ * - User data extracted from JWT tokens
+ * - Token validation and refresh logic
+ * - Login/logout state management
+ * - Authentication loading states
+ * 
+ * Features:
+ * - Automatic token validation on app load
+ * - localStorage persistence for tokens
+ * - JWT parsing for user information extraction
+ * - Logout with server notification
+ */
 const authSlice = createSlice({
   name: 'auth',
   initialState: {

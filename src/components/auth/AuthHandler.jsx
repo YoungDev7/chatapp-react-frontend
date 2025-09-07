@@ -6,7 +6,20 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
 import { setToken, setUser, validateToken } from '../../store/slices/authSlice';
 
-
+/**
+ * AuthHandler component that manages authentication interceptors for API requests.
+ * 
+ * This component sets up two main interceptors:
+ * 1. Request interceptor: Automatically adds Authorization headers with Bearer token to outgoing requests
+ * 2. Response interceptor: Handles token expiration by attempting to refresh tokens and retry failed requests
+ * 
+ * The component also validates the current token on mount and handles automatic token refresh
+ * when receiving 401 responses with "Invalid token EXPIRED" message from the server.
+ * 
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Child components to render
+ * @returns {React.ReactNode} The child components
+ */
 // eslint-disable-next-line react/prop-types
 export default function AuthHandler ({ children }) {
     const navigate = useNavigate();
