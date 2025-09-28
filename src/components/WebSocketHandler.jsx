@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import SockJS from 'sockjs-client';
 import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 
-
 /**
  * WebSocketHandler component that manages WebSocket connection lifecycle.
  * 
@@ -26,6 +25,7 @@ import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 export default function WebSocketHandler({ children }) {
     const dispatch = useDispatch();
     const { token } = useSelector(state => state.auth);
+    const env = import.meta.env;
 
     useEffect(() => {
         if(!token) {
@@ -40,7 +40,7 @@ export default function WebSocketHandler({ children }) {
         
         // STOMP client
         const client = new Client({
-            webSocketFactory: () => new SockJS(`http://localhost:8080/ws?token=Bearer ${encodeURIComponent(token)}`),
+                webSocketFactory: () => new SockJS(`${env.VITE_WS_BASE_URL}?token=Bearer ${encodeURIComponent(token)}`),
             connectHeaders: {
                 Authorization: `Bearer ${token}`, 
             },

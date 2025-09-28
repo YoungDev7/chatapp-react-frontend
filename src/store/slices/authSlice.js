@@ -80,7 +80,6 @@ const updateUserFromToken = (state, token) => {
 };
 
 const clearAuthState = (state) => {
-  console.debug("reached");
   state.token = null;
   state.user = { email: null, name: null, uid: null };
   state.isValidating = false;
