@@ -77,7 +77,7 @@ export default function Register() {
 
     if(isSubmitted){
         return (
-            <Container className='mt-5 bg-dark p-5 rounded text-white' style={{ width: '30vw' }}>
+            <Container className='mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded text-white mx-auto' style={{ maxWidth: '400px' }}>
                 {isRegistrationSuccess === null && (
                     <>
                         <h1 className='text-nowrap'>Registration submitted</h1>
@@ -105,7 +105,7 @@ export default function Register() {
         );
     }else {
         return (
-        <Container className="mt-5 w-25 bg-dark p-5 rounded">
+        <Container className="mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded mx-auto" style={{maxWidth: '400px'}}>
         <Form noValidate onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
                 <Form.Label className='text-white'>Username</Form.Label>

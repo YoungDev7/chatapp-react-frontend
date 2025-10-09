@@ -34,7 +34,7 @@ export default function Login() {
   };
 
   return (
-    <Container className="mt-5 w-25 bg-dark p-5 rounded">
+    <Container className="mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded mx-auto" style={{maxWidth: '400px'}}>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label className='text-white'>email</Form.Label>
