@@ -1,16 +1,17 @@
-// eslint-disable-next-line no-unused-vars
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Paper,
+  TextField
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
 import MessageContainer from './MessageContainer';
-
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
 
 /**
  * ChatView component that displays the main chat interface.
@@ -65,30 +66,77 @@ export default function ChatView() {
   }
   
   return (
-    <>
-    <Container style={{ maxWidth: '60vw', height: '80vh', marginTop: '1.2rem'}}>
-        <Row style={{ height: '100%', marginBottom: '1.2rem' }}>
-            <Col style={{ height: '100%' }}>
-              <MessageContainer messages={chatViewCollection[0].messages} />
-            </Col>
-        </Row>
-        <Row>
-            <Col>
-              <Form.Control 
-                className="bg-secondary text-white" 
-                type='text' 
-                id="inputMessage" 
-                value={inputMessage} 
-                onChange={(e) => setInputMessage(e.target.value)} 
-                              />
-            </Col>
-            <Col xs={1} className='p-0'>
-              <Button className="d-flex align-items-center" type="submit" onClick={handleMessageSend}>
-                Send <FontAwesomeIcon icon={faPaperPlane} className="ms-2" />
-              </Button>
-            </Col>
-        </Row>
+    <Container 
+      maxWidth={false}
+      sx={{ 
+        maxWidth: '65vw', 
+        height: '90vh', 
+        mt: 2.5,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Box sx={{ flexGrow: 1, mb: 2, height: '65vh' }}>
+        <Paper 
+          elevation={1} 
+          sx={{ 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden' // Prevent Paper from overflowing
+          }}
+        >
+          <MessageContainer messages={chatViewCollection[0]?.messages || []} />
+        </Paper>
+      </Box>
+      
+      <Grid container spacing={1} alignItems="center">
+        <Grid sx={{width: '84%'}}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            type="text"
+            id="inputMessage"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: '#424242',
+                color: 'white',
+                '& fieldset': {
+                  borderColor: '#666',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#888',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#1976d2',
+                },
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              }
+            }}
+          />
+        </Grid>
+        <Grid sx={{width: 'max'}}>
+          <Button
+            variant="contained"
+            onClick={handleMessageSend}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              minWidth: 'auto',
+              px: 2,
+              p: 2
+            }}
+          >
+            Send
+            <FontAwesomeIcon icon={faPaperPlane} />
+          </Button>
+        </Grid>
+      </Grid>
     </Container>
-    </>
-  )
+  );
 }

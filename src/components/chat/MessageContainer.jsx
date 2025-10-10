@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-// eslint-disable-next-line no-unused-vars
+import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import ChatMessage from './ChatMessage';
@@ -15,11 +15,27 @@ const MessageContainer = ({ messages }) => {
   }, [messages]);
 
   return (
-    <div className="bg-secondary border border-dark border-2 d-flex flex-column overflow-auto" ref={containerRef} style={{ height: '100%' }}>
+    <Box 
+      ref={containerRef}
+      sx={{
+        backgroundColor: '#6c757d',
+        border: '2px solid #343a40',
+        display: 'flex',
+        flexDirection: 'column',
+        overflowY: 'auto', // Ensure vertical scrolling
+        height: '100%',    // Fill parent height
+        minHeight: 0       // Fix flexbox overflow issue
+      }}
+    >
       {messages.map((message) => (
-        <ChatMessage key={message.id} text={message.text} sender={message.sender.name} isUser={ message.sender.uid === user.uid ? true : false } />
+        <ChatMessage 
+          key={message.id} 
+          text={message.text} 
+          sender={message.sender.name} 
+          isUser={message.sender.uid === user.uid ? true : false} 
+        />
       ))}
-    </div>
+    </Box>
   );
 };
 

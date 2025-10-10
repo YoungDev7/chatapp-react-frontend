@@ -1,8 +1,14 @@
-// eslint-disable-next-line no-unused-vars
-import { Container, Nav, Navbar } from 'react-bootstrap';
+import {
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Paper
+} from '@mui/material';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import { handleLogout } from '../store/slices/authSlice';
-import '../style/Sidebar.css';
 
 /**
  * Sidebar component that provides navigation and user actions.
@@ -17,16 +23,49 @@ export default function Sidebar() {
   const dispatch = useDispatch();
 
   return (
-    <Navbar bg='dark' >
-      <Container>
-        <Navbar.Toggle aria-controls='basic-navbar-nav' />
-        <Navbar.Collapse id='basic-navbar-nav'>
-          <Nav className='vh-100 p-3 flex-column w-100' variant='pills' defaultActiveKey="/">
-            <Nav.Link className='text-white' href='/'>Chat</Nav.Link>
-            <Nav.Link onClick={() => dispatch(handleLogout())} className=' text-light mt-auto bg-dark'>Logout</Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-  )
+      <Paper
+        elevation={2} 
+        sx={{ 
+          height: '100vh',
+          backgroundColor: 'primary.main',
+          borderRadius: 0,
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          boxSizing: 'border-box',
+          p: 2
+        }}
+    >
+      <List sx={{ flexGrow: 1 }}>
+        <ListItem disablePadding>
+          <ListItemButton 
+            href="/"
+            sx={{ 
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              }
+            }}
+          >
+            <ListItemText primary="Chat" />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      
+      <Button
+        onClick={() => dispatch(handleLogout())}
+        variant="outlined"
+        sx={{
+          color: 'white',
+          borderColor: 'white',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderColor: 'white'
+          }
+        }}
+      >
+        Logout
+      </Button>
+    </Paper>
+  );
 }

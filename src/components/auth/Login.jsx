@@ -1,5 +1,14 @@
+import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Link,
+  Paper,
+  TextField,
+  Typography
+} from '@mui/material';
 import { useState } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
@@ -34,38 +43,108 @@ export default function Login() {
   };
 
   return (
-    <Container className="mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded mx-auto" style={{maxWidth: '400px'}}>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label className='text-white'>email</Form.Label>
-          <Form.Control
-            type="text"
+    <Container 
+      maxWidth="sm" 
+      sx={{ 
+        mt: 5, 
+        display: 'flex', 
+        justifyContent: 'center' 
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 3, md: 5 },
+          width: '100%',
+          maxWidth: 400,
+          backgroundColor: 'grey.900',
+          color: 'white'
+        }}
+      >
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{
+            width: '100%',
+            fontSize: 'clamp(2rem, 10vw, 2.15rem)',
+            mb: 3
+          }}
+        >
+          Login
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Email"
+            type="email"
             value={credentials.email}
             onChange={(e) => setCredentials({
               ...credentials,
               email: e.target.value
             })}
+            sx={{ 
+              mb: 3,
+              '& .MuiInputLabel-root': { color: 'white' },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.600' },
+                '&:hover fieldset': { borderColor: 'grey.400' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+              }
+            }}
+            InputLabelProps={{ style: { color: 'white' } }}
           />
-        </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label className='text-white'>Password</Form.Label>
-          <Form.Control
+          <TextField
+            fullWidth
+            label="Password"
             type="password"
             value={credentials.password}
             onChange={(e) => setCredentials({
               ...credentials,
               password: e.target.value
             })}
+            sx={{ 
+              mb: 3,
+              '& .MuiInputLabel-root': { color: 'white' },
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                '& fieldset': { borderColor: 'grey.600' },
+                '&:hover fieldset': { borderColor: 'grey.400' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+              }
+            }}
+            InputLabelProps={{ style: { color: 'white' } }}
           />
-        </Form.Group>
 
-        <Button className='w-100 mt-3' type="submit">Login</Button>
+          <Button 
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 3, mb: 3 }}
+          >
+            Login
+          </Button>
 
-        <hr className="border border-3 border-dark-subtle" />
+          <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
 
-        <div className='text-white'>dont have an account? <a className='text-primary text-primary-hover text-decoration-underline' href="/register">Register now</a> </div>
-      </Form>
+          <Typography variant="body2" sx={{ color: 'white', textAlign: 'center' }}>
+            Dont have an account?{' '}
+            <Link 
+              href="/register" 
+              sx={{ 
+                color: 'primary.main',
+                textDecoration: 'underline',
+                '&:hover': {
+                  color: 'primary.light'
+                }
+              }}
+            >
+              Register now
+            </Link>
+          </Typography>
+        </Box>
+      </Paper>
     </Container>
-  )
+  );
 }

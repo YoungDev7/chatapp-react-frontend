@@ -1,16 +1,4 @@
 body{
-  background-color:gray;
-  /* margin: 30px; */
-  height: 100vh;
   margin: 0;
   overflow: hidden;
-}
-
-.visible{
-  background-color: aquamarine;
-}
-
-.text-primary-hover:hover {
-  color: #0B5ED7 !important; 
-  transition: 0.1s;
 }

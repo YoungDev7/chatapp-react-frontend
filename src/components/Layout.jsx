@@ -1,20 +1,21 @@
 // eslint-disable-next-line no-unused-vars
-import React from 'react'
-import { Container, Row, Col } from 'react-bootstrap';
+import { Box, Grid } from '@mui/material';
 import Sidebar from './Sidebar';
 
 // eslint-disable-next-line react/prop-types
 export default function Layout({ children }) {
   return (
-    <Container fluid className="p-0">
-        <Row>
-            <Col xs={2}>
-                <Sidebar />
-            </Col>
-            <Col xs={10}>
-                {children}
-            </Col>
-        </Row>
-    </Container>
-  )
+    <Box sx={{ flexGrow: 1, height: '100vh' }}>
+      <Grid container spacing={0} sx={{ height: '100%' }}>
+        <Grid size={3}>
+            <Sidebar />
+        </Grid>
+        <Grid size={9}>
+          <Box sx={{ height: '100%', p: 2 }}>
+            {children}
+          </Box>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }

@@ -1,5 +1,11 @@
+import { Container, FormControl, Paper } from '@mui/material';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
 import api from '../../services/Api';
 
 /**
@@ -22,45 +28,71 @@ import api from '../../services/Api';
 export default function Register() {
     const [ isSubmitted, setIsSubmitted ] = useState(false);
     const [ isRegistrationSuccess, setIsRegistrationSuccess ] = useState(null);
-    const [showValidation, setShowValidation] = useState(false);
-    const [passwordsMatch, setPasswordsMatch] = useState(true);
+    const [emailError, setEmailError] = useState(false);
+    const [emailErrorMessage, setEmailErrorMessage] = useState('');
+    const [passwordError, setPasswordError] = useState(false);
+    const [passwordConfirmError, setPasswordConfirmError] = useState(false);
+    const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+    const [passwordConfirmErrorMessage, setPasswordConfirmErrorMessage] = useState('');
+    const [nameError, setNameError] = useState(false);
+    const [nameErrorMessage, setNameErrorMessage] = useState('');
     const [credentials, setCredentials] = useState({
         username: '',
         email: '',
         password: '',
         passwordConfirm: '',
-     });
-     
-    const handlePasswordConfirmChange = (e) => {
-        const confirmValue = e.target.value;
-        setCredentials({
-            ...credentials,
-            passwordConfirm: confirmValue
-        });
-        setPasswordsMatch(credentials.password === confirmValue);
-    };
+    });
 
-    const handlePasswordChange = (e) => {
-        const passwordValue = e.target.value;
-        setCredentials({
-            ...credentials,
-            password: passwordValue
-        });
-        setPasswordsMatch(passwordValue === credentials.passwordConfirm);
+    const validateInputs = () => {
+        let isValid = true;
+
+        // email
+        if (!credentials.email || !/\S+@\S+\.\S+/.test(credentials.email)) {
+            setEmailError(true);
+            setEmailErrorMessage('Please enter a valid email address.');
+            isValid = false;
+        } else {
+            setEmailError(false);
+            setEmailErrorMessage('');
+        }
+
+        // password lenght
+        if (!credentials.password || credentials.password.length < 6) {
+            setPasswordError(true);
+            setPasswordErrorMessage('Password must be at least 6 characters long.');
+            isValid = false;
+        } else {
+            setPasswordError(false);
+            setPasswordErrorMessage('');
+        }
+
+        // password confirmation match
+        if (!credentials.password || credentials.password !== credentials.passwordConfirm) {
+            setPasswordConfirmError(true);
+            setPasswordConfirmErrorMessage('Passwords dont match.');
+            isValid = false;
+        } else {
+            setPasswordConfirmError(false);
+            setPasswordConfirmErrorMessage('');
+        }
+
+        //username
+        if (!credentials.username || credentials.username < 1) {
+            setNameError(true);
+            setNameErrorMessage('Name is required.');
+            isValid = false;
+        } else {
+            setNameError(false);
+            setNameErrorMessage('');
+        }
+
+        return isValid;
     };
      
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setShowValidation(true);
-
-        // Manual validation
-        const isValid = credentials.username && 
-                        credentials.email && 
-                        credentials.password && 
-                        credentials.passwordConfirm && 
-                        credentials.password === credentials.passwordConfirm;
-
-        if (!isValid) {
+        
+        if (!validateInputs()) {
             return;
         }
         
@@ -77,110 +109,275 @@ export default function Register() {
 
     if(isSubmitted){
         return (
-            <Container className='mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded text-white mx-auto' style={{ maxWidth: '400px' }}>
-                {isRegistrationSuccess === null && (
-                    <>
-                        <h1 className='text-nowrap'>Registration submitted</h1>
-                        <div className='pt-3'>please wait...</div>
-                    </>
-                )}
-                {isRegistrationSuccess !== null && (
-                    <>
-                        {isRegistrationSuccess === true && (
-                            <>
-                                <h1>Registration Success</h1>
-                                <div className='pt-3'>Registration was success! you can <a className='text-primary text-primary-hover text-decoration-underline' href="/login">Login</a> now</div>
-                            </>
-                        )}
-                        {/* TODO: implement proper user feedback when username/email is taken */}
-                        {isRegistrationSuccess === false && (
-                            <>
-                                <h1>Registration Error</h1>
-                                <div className='pt-3'>There has been an error while registering, please try again later</div>
-                            </>
-                        )}
-                    </>
-                )}
+            <Container
+                maxWidth="sm"
+                sx={{
+                    mt: 5,
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}
+            >
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: { xs: 3, md: 5 },
+                        width: '100%',
+                        maxWidth: 400,
+                        backgroundColor: 'grey.900',
+                        color: 'white'
+                    }}
+                >
+                    {isRegistrationSuccess === null && (
+                        <>
+                            <Typography
+                                component="h1"
+                                variant="h4"
+                                sx={{
+                                    fontSize: 'clamp(1.5rem, 10vw, 2rem)',
+                                    mb: 2,
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                Registration submitted
+                            </Typography>
+                            <Typography variant="body1" sx={{ pt: 3 }}>
+                                please wait...
+                            </Typography>
+                        </>
+                    )}
+                    {isRegistrationSuccess !== null && (
+                        <>
+                            {isRegistrationSuccess === true && (
+                                <>
+                                    {/* TODO: change to immedietly login user */}
+                                    <Typography
+                                        component="h1"
+                                        variant="h4"
+                                        sx={{
+                                            fontSize: 'clamp(1.5rem, 10vw, 2rem)',
+                                            mb: 2
+                                        }}
+                                    >
+                                        Registration Success
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ pt: 3 }}>
+                                        Registration was success! you can{' '}
+                                        <Link
+                                            href="/login"
+                                            sx={{
+                                                color: 'primary.main',
+                                                textDecoration: 'underline',
+                                                '&:hover': {
+                                                    color: 'primary.light'
+                                                }
+                                            }}
+                                        >
+                                            Login
+                                        </Link>
+                                        {' '}now
+                                    </Typography>
+                                </>
+                            )}
+                            {/* TODO: implement proper user feedback when username/email is taken */}
+                            {isRegistrationSuccess === false && (
+                                <>
+                                    <Typography
+                                        component="h1"
+                                        variant="h4"
+                                        sx={{
+                                            fontSize: 'clamp(1.5rem, 10vw, 2rem)',
+                                            mb: 2
+                                        }}
+                                    >
+                                        Registration Error
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ pt: 3 }}>
+                                        There has been an error while registering, please try again later
+                                    </Typography>
+                                </>
+                            )}
+                        </>
+                    )}
+                </Paper>
             </Container>
         );
     }else {
         return (
-        <Container className="mt-5 w-100 w-sm-75 w-md-50 w-lg-25 bg-dark p-3 p-md-5 rounded mx-auto" style={{maxWidth: '400px'}}>
-        <Form noValidate onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-                <Form.Label className='text-white'>Username</Form.Label>
-                <Form.Control
-                    type="text"
-                    name="username"
-                    value={credentials.username}
-                    onChange={(e) => setCredentials({
-                        ...credentials,
-                        username: e.target.value
-                    })}
-                    isInvalid={showValidation && !credentials.username}
-                    isValid={showValidation && credentials.username}
-                />
-                <Form.Control.Feedback type="invalid">
-                    Please choose a username.
-                </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-                <Form.Label className='text-white'>Email</Form.Label>
-                <Form.Control
-                    type="email"
-                    name="email"
-                    value={credentials.email}
-                    onChange={(e) => setCredentials({
-                        ...credentials,
-                        email: e.target.value
-                    })}
-                    isInvalid={showValidation && !credentials.email}
-                    isValid={showValidation && credentials.email}
-                />
-                <Form.Control.Feedback type="invalid">
-                    Please fill in email.
-                </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-                <Form.Label className='text-white'>Password</Form.Label>
-                <Form.Control
-                    type="password"
-                    name="password"
-                    value={credentials.password}
-                    onChange={handlePasswordChange}
-                    isInvalid={showValidation && !credentials.password}
-                    isValid={showValidation && credentials.password}
-                />
-                <Form.Control.Feedback type="invalid">
-                    Please fill in password.
-                </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-                <Form.Label className='text-white'>Confirm Password</Form.Label>
-                <Form.Control
-                    type="password"
-                    name="passwordConfirm"
-                    value={credentials.passwordConfirm}
-                    onChange={handlePasswordConfirmChange}
-                    isInvalid={showValidation && (!credentials.passwordConfirm || !passwordsMatch)}
-                    isValid={showValidation && credentials.passwordConfirm && passwordsMatch}
-                />
-                <Form.Control.Feedback type="invalid">
-                    {!credentials.passwordConfirm ? 'Please fill in password again.' : 'Passwords do not match.'}
-                </Form.Control.Feedback>
-            </Form.Group>
-
-            <Button className='w-100 mt-3' type="submit">Register</Button>
-
-            <hr className="border border-3 border-dark-subtle" />
-
-            <div className='text-white'>Already have an account? <a className='text-primary text-primary-hover text-decoration-underline' href="/login">Login now</a></div>
-        </Form>
-        </Container>
-    );
+            <Container 
+                maxWidth="sm"
+                sx={{
+                    mt: 5,
+                    display: 'flex',
+                    justifyContent: 'center'
+                }}
+            >
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: { xs: 3, md: 5 },
+                        width: '100%',
+                        maxWidth: 400,
+                        backgroundColor: 'grey.900',
+                        color: 'white'
+                    }}
+                >
+                    <Typography
+                        component="h1"
+                        variant="h4"
+                        sx={{ 
+                            width: '100%', 
+                            fontSize: 'clamp(2rem, 10vw, 2.15rem)', 
+                            mb: 3
+                        }}
+                    >
+                        Register
+                    </Typography>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                    >
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                label="Username"
+                                autoComplete="username"
+                                id="username"
+                                value={credentials.username}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    username: e.target.value
+                                })}
+                                error={nameError}
+                                helperText={nameErrorMessage}
+                                color={nameError ? 'error' : 'white'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                id="email"
+                                name="email"
+                                autoComplete="email"
+                                type="email"
+                                label="Email"
+                                variant="outlined"
+                                value={credentials.email}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    email: e.target.value
+                                })}
+                                error={emailError}
+                                helperText={emailErrorMessage}
+                                color={emailError ? 'error' : 'white'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                name="password"
+                                type="password"
+                                id="password"
+                                label="Password"
+                                autoComplete="new-password"
+                                variant="outlined"
+                                value={credentials.password}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    password: e.target.value
+                                })}
+                                error={passwordError}
+                                helperText={passwordErrorMessage}
+                                color={passwordError ? 'error' : 'white'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                type="password"
+                                name="passwordConfirm"
+                                id="passwordConfirm"
+                                label="Confirm Password"
+                                autoComplete="passwordConfirm"
+                                variant="outlined"
+                                value={credentials.passwordConfirm}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    passwordConfirm: e.target.value
+                                })}
+                                error={passwordConfirmError}
+                                helperText={passwordConfirmErrorMessage}
+                                color={passwordConfirmError ? 'error' : 'white'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3, mb: 3 }}
+                        >
+                            Register
+                        </Button>
+                    </Box>
+                    <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
+                    <Typography variant="body2" sx={{ color: 'white', textAlign: 'center' }}>
+                        Already have an account?{' '}
+                        <Link
+                            href="/login"
+                            sx={{
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                                '&:hover': {
+                                    color: 'primary.light'
+                                }
+                            }}
+                        >
+                            Login now
+                        </Link>
+                    </Typography>
+                </Paper>
+            </Container>
+        )
     }
     
 }

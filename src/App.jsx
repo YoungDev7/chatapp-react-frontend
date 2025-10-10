@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import 'bootstrap/dist/css/bootstrap.min.css';
+import CssBaseline from '@mui/material/CssBaseline';
 import { Outlet, Route, Routes } from 'react-router-dom';
 import AuthHandler from './components/auth/AuthHandler';
 import Login from './components/auth/Login';
@@ -12,6 +12,7 @@ import WebSocketHandler from './components/WebSocketHandler';
 function App() {
   return (
     <AuthHandler> {/*provides acces to token and handles token auth*/}
+      <CssBaseline />
       <Routes>
         <Route path="/login" element={<Login />} /> {/* login page where user gets redirected if not authorized */}
         <Route path="/register" element={<Register />} />
