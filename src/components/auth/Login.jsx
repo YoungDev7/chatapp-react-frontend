@@ -1,8 +1,11 @@
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   Divider,
+  Grow,
   Link,
   Paper,
   TextField,
@@ -25,22 +28,36 @@ import { setToken, setUser } from '../../store/slices/authSlice';
  */
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
+  const [isLoginSuccess, setIsLoginSuccess] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setIsLoginSuccess(null);
     try {
       // Send login request to the server, implicitly skipping the auth interceptor
       const response = await api.post('/auth/authenticate', credentials, {skipAuthInterceptor: true});
       dispatch(setToken(response.data.access_token));
       dispatch(setUser(response.data.access_token));
+      setIsLoginSuccess(true);
       navigate('/');
     } catch (error) {
+      setIsLoginSuccess(false);
       console.error('Login failed:', error);
-      // Handle login error (show message to user)
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  let buttonContent;
+  if (isLoading) {
+    buttonContent = <CircularProgress size={24} sx={{ color: 'white' }} />;
+  } else {
+    buttonContent = 'Login';
+  }
 
   return (
     <Container 
@@ -48,9 +65,38 @@ export default function Login() {
       sx={{ 
         mt: 5, 
         display: 'flex', 
-        justifyContent: 'center' 
+        justifyContent: 'center', 
+        flexDirection: 'column'
       }}
     >
+      <Box sx={{ height: 60, mb: 1, display: 'flex', alignItems: 'center' }}>
+        {isLoginSuccess === false && (
+          <Grow in={!isLoginSuccess}>
+            <Alert 
+              severity="error" 
+              variant='filled'
+              sx={{
+                width:'100%',
+                maxWidth: 400
+              }} >
+                Login failed
+              </Alert>
+          </Grow>
+        )}
+        {isLoginSuccess === true && (
+          <Grow in={isLoginSuccess}>
+            <Alert
+              severity="success"
+              variant='filled'
+              sx={{
+                width: '100%',
+                maxWidth: 400
+              }} >
+              Login successful
+            </Alert>
+          </Grow>
+        )}
+      </Box>
       <Paper
         elevation={3}
         sx={{
@@ -77,6 +123,8 @@ export default function Login() {
             fullWidth
             label="Email"
             type="email"
+            disabled={isLoading}
+            error={isLoginSuccess === null || isLoginSuccess === true ? false : true}
             value={credentials.email}
             onChange={(e) => setCredentials({
               ...credentials,
@@ -99,6 +147,8 @@ export default function Login() {
             fullWidth
             label="Password"
             type="password"
+            disabled={isLoading}
+            error={isLoginSuccess === null || isLoginSuccess === true ? false : true}
             value={credentials.password}
             onChange={(e) => setCredentials({
               ...credentials,
@@ -121,9 +171,10 @@ export default function Login() {
             type="submit"
             variant="contained"
             fullWidth
+            disabled={isLoading}
             sx={{ mt: 3, mb: 3 }}
           >
-            Login
+            {buttonContent}
           </Button>
 
           <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
