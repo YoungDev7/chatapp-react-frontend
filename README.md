@@ -84,7 +84,7 @@ src/
    Configure the following variables in `.env`:
    ```env
    VITE_API_BASE_URL=http://localhost:8080/api/v1
-   VITE_WS_BASE_URL=ws://localhost:8080/ws
+   VITE_WS_BASE_URL=http://localhost:8080/ws
    ```
 
 4. **Start development server**
