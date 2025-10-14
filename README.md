@@ -2,6 +2,8 @@
 
 A real-time chat application frontend built with React, Vite, and Redux Toolkit. Features JWT authentication, WebSocket connections for real-time messaging, and a responsive Bootstrap UI.
 
+![Application Architecture](documentation/architecture_diagram.png)
+
 ## 🚀 Technologies Used
 
 - **React 18** - UI library
@@ -265,7 +267,11 @@ The application is containerized and deployed using Docker Compose from the back
 
 ## 📚 Documentation
 
-Additional documentation available in the [backend repository documentation folder](../chatapp-spring-backend/documentation):
+#### Token Refresh Flowchart
+![Token Refresh Sequence](documentation/flowchart_error_handling.png)
+*Token refresh mechanism*
+
+Additional documentation available in the [backend repository](https://github.com/YoungDev7/chatapp-spring-backend):
 - Architecture diagrams
 - Sequence diagrams
 - API integration guides
@@ -280,7 +286,7 @@ Additional documentation available in the [backend repository documentation fold
 
 ## 🔗 Related Projects
 
-- [Backend Repository](../chatapp-spring-backend) - Spring Boot backend application
+- [Backend Repository](https://github.com/YoungDev7/chatapp-spring-backend) - Spring Boot backend application
 
 ## 📄 License
 
