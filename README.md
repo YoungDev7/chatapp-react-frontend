@@ -276,14 +276,6 @@ Additional documentation available in the [backend repository](https://github.co
 - Sequence diagrams
 - API integration guides
 
-## 🏗️ System Architecture
-
-![Application Architecture](../chatapp-spring-backend/documentation/diagrams/architecture.png)
-
-## 🔐 Authentication Flow
-
-![Authentication Sequence](../chatapp-spring-backend/documentation/diagrams/auth-sequence.png)
-
 ## 🔗 Related Projects
 
 - [Backend Repository](https://github.com/YoungDev7/chatapp-spring-backend) - Spring Boot backend application
