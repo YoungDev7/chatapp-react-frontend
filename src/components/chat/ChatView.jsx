@@ -59,7 +59,7 @@ export default function ChatView() {
     if (stompClient && connectionStatus === 'connected') {
       stompClient.publish({
         destination: "/app/chat",
-        body: JSON.stringify({ text: inputMessage, sender: user.name, senderUid: user.uid })
+        body: JSON.stringify({ text: inputMessage})
       });
       setInputMessage('');
     }

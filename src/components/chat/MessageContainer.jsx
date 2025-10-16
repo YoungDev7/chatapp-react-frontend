@@ -27,12 +27,12 @@ const MessageContainer = ({ messages }) => {
         minHeight: 0       // Fix flexbox overflow issue
       }}
     >
-      {messages.map((message) => (
+      {messages.map((message, index) => (
         <ChatMessage 
-          key={message.id} 
+          key={index} 
           text={message.text} 
-          sender={message.sender.name} 
-          isUser={message.sender.uid === user.uid ? true : false} 
+          sender={message.senderName} 
+          isUser={message.senderName === user.name ? true : false} 
         />
       ))}
     </Box>
