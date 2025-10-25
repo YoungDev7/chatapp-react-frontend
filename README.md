@@ -1,15 +1,17 @@
 # Chat Application - Frontend
 
-A real-time chat application frontend built with React, Vite, and Redux Toolkit. Features JWT authentication, WebSocket connections for real-time messaging, and a responsive Bootstrap UI.
+A real-time chat application frontend built with React, TypeScript, Vite, and Redux Toolkit. Features JWT authentication, WebSocket connections for real-time messaging, and a responsive Material-UI design.
 
 ![Application Architecture](documentation/architecture_diagram.png)
 
 ## 🚀 Technologies Used
 
-- **React 18** - UI library
-- **Vite** - Build tool and dev server
-- **Redux Toolkit** - State management
-- **Bootstrap 5** - UI framework
+- **React 19** 
+- **TypeScript** 
+- **Vite** 
+- **Redux Toolkit** 
+- **Material-UI (MUI)** 
+- **STOMP/SockJS** 
 
 ## 📋 Features
 
@@ -17,8 +19,9 @@ A real-time chat application frontend built with React, Vite, and Redux Toolkit.
 - Real-time messaging via WebSocket/STOMP
 - Automatic token refresh
 - Protected routes
-- Responsive design
+- Responsive design with Material-UI
 - Message history
+- Type-safe codebase with TypeScript
 
 ## 🏗️ Project Structure
 
@@ -26,30 +29,33 @@ A real-time chat application frontend built with React, Vite, and Redux Toolkit.
 src/
 ├── components/
 │   ├── auth/
-│   │   ├── AuthHandler.jsx      # Authentication provider
-│   │   ├── Login.jsx           # Login form
-│   │   └── Register.jsx        # Registration form
+│   │   ├── AuthHandler.tsx      # Authentication provider
+│   │   ├── Login.tsx           # Login form
+│   │   └── Register.tsx        # Registration form
 │   ├── chat/
-│   │   ├── ChatView.jsx        # Main chat interface
-│   │   ├── ChatMessage.jsx     # Individual message component
-│   │   └── MessageContainer.jsx # Message list container
-│   ├── Layout.jsx              # Main layout wrapper
-│   ├── ProtectedRoute.jsx      # Route protection
-│   └── WebSocketHandler.jsx    # WebSocket connection management
-│   └── Sidebar.jsx             # Sidebar component
+│   │   ├── ChatView.tsx        # Main chat interface
+│   │   ├── ChatMessage.tsx     # Individual message component
+│   │   └── MessageContainer.tsx # Message list container
+│   ├── Layout.tsx              # Main layout wrapper
+│   ├── ProtectedRoute.tsx      # Route protection
+│   ├── Sidebar.tsx             # Navigation sidebar
+│   └── WebSocketHandler.tsx    # WebSocket connection management
 ├── services/
-│   └── Api.jsx                 # Axios configuration
+│   └── Api.tsx                 # Axios configuration
 ├── store/
-│   ├── store.js               # Redux store configuration
+│   ├── store.ts               # Redux store configuration
+│   ├── hooks.ts               # Typed Redux hooks
 │   └── slices/
-│       ├── authSlice.js       # Authentication state
-│       ├── chatViewSlice.js   # Chat messages state
-│       └── wsSlice.js         # WebSocket state
+│       ├── authSlice.ts       # Authentication state
+│       ├── chatViewSlice.ts   # Chat messages state
+│       └── wsSlice.ts         # WebSocket state
 ├── style/
 │   ├── index.css             # Global styles
 │   └── ChatMessage.css       # Message styling
-│   └── Sidebar.css           # Sidebar styling
-└── App.jsx                   # Main app component
+├── types/
+│   └── custom.d.ts           # Custom type definitions
+├── vite-env.d.ts             # Vite environment types
+└── App.tsx                   # Main app component
 ```
 
 ## 🛠️ Installation & Setup
@@ -116,8 +122,8 @@ docker-compose up --build
 ## 🔧 Configuration
 
 ### API Configuration
-The API base URL is configured in [`src/services/Api.jsx`](src/services/Api.jsx):
-```javascript
+The API base URL is configured in [`src/services/Api.tsx`](src/services/Api.tsx):
+```typescript
 const api = axios.create({
   baseURL: env.VITE_API_BASE_URL,
   withCredentials: true
@@ -125,72 +131,79 @@ const api = axios.create({
 ```
 
 ### Redux Store
-State management is configured in [`src/store/store.js`](src/store/store.js) with three main slices:
+State management is configured in [`src/store/store.ts`](src/store/store.ts) with three main slices:
 - **authSlice** - User authentication and token management
 - **wsSlice** - WebSocket connection state
 - **chatViewSlice** - Chat messages and UI state
 
+Typed hooks are provided in [`src/store/hooks.ts`](src/store/hooks.ts) for type-safe Redux usage:
+```typescript
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+```
+
 ## 🔐 Authentication Flow
 
-1. User registers/logs in via [`Login.jsx`](src/components/auth/Login.jsx) or [`Register.jsx`](src/components/auth/Register.jsx)
-2. JWT tokens are received and stored via [`AuthHandler`](src/components/auth/AuthHandler.jsx)
-3. Protected routes are accessed through [`ProtectedRoute`](src/components/ProtectedRoute.jsx)
+1. User registers/logs in via [`Login.tsx`](src/components/auth/Login.tsx) or [`Register.tsx`](src/components/auth/Register.tsx)
+2. JWT tokens are received and stored via [`AuthHandler`](src/components/auth/AuthHandler.tsx)
+3. Protected routes are accessed through [`ProtectedRoute`](src/components/ProtectedRoute.tsx)
 4. Automatic token refresh handles expired access tokens
 
 ## 💬 Real-time Messaging
 
 The application uses WebSocket/STOMP for real-time communication:
-- Connection managed by [`WebSocketHandler`](src/components/WebSocketHandler.jsx)
+- Connection managed by [`WebSocketHandler`](src/components/WebSocketHandler.tsx)
 - Messages sent to `/app/chat` endpoint
 - Real-time updates received from `/topic/messages`
-- Message state managed in [`chatViewSlice`](src/store/slices/chatViewSlice.js)
+- Message state managed in [`chatViewSlice`](src/store/slices/chatViewSlice.ts)
 
 ## 📊 State Management
 
 ### Auth State
-```javascript
+```typescript
 {
-   token: string,
+   token: string | null,
    user: {
-      email: string, 
-      name: string,
-      uid: string
+      email: string | null, 
+      name: string | null,
+      uid: string | null
    },
    isValidating: boolean,
 }
 ```
 
 ### Chat State
-```javascript
+```typescript
 {
   chatViewCollection: [{
     viewId: number,
     title: string,
-    messages: Array,
+    messages: Message[],
     isLoading: boolean,
-    error: string
+    error: string | null
   }]
 }
 ```
 
 ### WebSocket State
-```javascript
+```typescript
 {
-  stompClient: StompClient,
-  connectionStatus: 'connected' | 'disconnected' | 'connecting'
+  stompClient: Client | null,
+  connectionStatus: 'connected' | 'disconnected' | 'connecting' | 'error'
 }
 ```
 
 ## 🎨 Styling
 
-- **Bootstrap 5** for responsive layout and components
+- **Material-UI (MUI)** for modern, responsive components
 - **Custom CSS** in [`src/style/`](src/style/) for chat-specific styling
 - **FontAwesome** icons for UI elements
+- Dark theme with customizable Material-UI theming
 
 ## 📱 Responsive Design
 
 The application is fully responsive with:
-- Mobile-first Bootstrap grid system
+- Material-UI Grid system
 - Flexible chat container sizing
 - Responsive message bubbles
 - Adaptive sidebar layout
@@ -215,22 +228,26 @@ Manages authentication state:
 - Token storage and validation
 - Automatic token refresh
 - User session management
+- Request/response interceptors
 
 ## 📋 Dependencies
 
 ### Production Dependencies
-- `react` & `react-dom` - Core React
+- `react` & `react-dom` - Core React (v19)
 - `@reduxjs/toolkit` & `react-redux` - State management
 - `react-router-dom` - Routing
 - `axios` - HTTP requests
 - `@stomp/stompjs` - WebSocket messaging
-- `bootstrap` & `react-bootstrap` - UI components
+- `sockjs-client` - SockJS WebSocket fallback
+- `@mui/material` - Material-UI components
 - `@fortawesome/*` - Icons
 
 ### Development Dependencies
+- `typescript` - TypeScript compiler
 - `vite` - Build tool
 - `eslint` - Code linting
-- Various ESLint plugins for React
+- `@typescript-eslint/*` - TypeScript ESLint plugins
+- Various type definitions (`@types/*`)
 
 ## 🚀 Deployment
 
@@ -243,7 +260,7 @@ The application is containerized and deployed using Docker Compose from the back
    npm run build
    ```
 
-2. **Deploy the `dist` folder** to your web server
+2. **Deploy the `dist` folder** to your web server (served by Nginx in production)
 
 3. **Configure environment variables** for production API URLs
 
@@ -255,11 +272,13 @@ The application is containerized and deployed using Docker Compose from the back
    - Check backend WebSocket configuration
    - Verify CORS settings
    - Ensure backend is running
+   - Check token is properly encoded in WebSocket URL
 
 2. **Authentication issues**
    - Check token expiration
    - Verify API endpoints
    - Clear browser storage if needed
+   - Check localStorage for `accessToken`
 
 3. **Build errors**
    - Update dependencies

@@ -2,8 +2,8 @@
 // eslint-disable-next-line no-unused-vars
 import { Client } from '@stomp/stompjs';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import SockJS from 'sockjs-client';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
 
 /**
@@ -22,10 +22,10 @@ import { setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
  * @param {React.ReactNode} props.children - Child components to render
  * @returns {React.ReactNode} The child components
  */
-export default function WebSocketHandler({ children }) {
-    const dispatch = useDispatch();
-    const { token } = useSelector(state => state.auth);
-    const env = import.meta.env;
+export default function WebSocketHandler({ children }: { children: React.ReactNode }) {
+    const dispatch = useAppDispatch();
+    const { token } = useAppSelector(state => state.auth);
+    const env: ImportMetaEnv & { VITE_WS_BASE_URL?: string } = import.meta.env;
 
     useEffect(() => {
         if(!token) {

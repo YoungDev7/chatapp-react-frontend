@@ -8,8 +8,8 @@ import {
   Paper,
   TextField
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
 import MessageContainer from './MessageContainer';
 
@@ -29,10 +29,9 @@ import MessageContainer from './MessageContainer';
  */
 export default function ChatView() {
   const [inputMessage, setInputMessage] = useState('');
-  const { chatViewCollection } = useSelector(state => state.chatView);
-  const { stompClient, connectionStatus } = useSelector(state => state.ws);
-  const { user } = useSelector(state => state.auth); 
-  const dispatch = useDispatch();
+  const { chatViewCollection } = useAppSelector(state => state.chatView);
+  const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchMessages());
@@ -41,7 +40,7 @@ export default function ChatView() {
   //websocket message handling
   useEffect(() => {
     if (stompClient && connectionStatus === 'connected') {
-      const subscription = stompClient.subscribe('/topic/messages', (message) => {
+      const subscription = stompClient.subscribe('/topic/messages', (message: { body: string }) => {
         const newMessage = JSON.parse(message.body);
         dispatch(addMessage(newMessage));
       });

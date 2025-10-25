@@ -7,7 +7,7 @@ import {
   Paper
 } from '@mui/material';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
 
 /**
@@ -19,8 +19,8 @@ import { handleLogout } from '../store/slices/authSlice';
  * 
  * @returns {React.ReactElement} Sidebar navigation component
  */
-export default function Sidebar() {
-  const dispatch = useDispatch();
+export default function Sidebar(): React.ReactElement {
+  const dispatch = useAppDispatch();
 
   return (
       <Paper
@@ -52,8 +52,8 @@ export default function Sidebar() {
         </ListItem>
       </List>
       
-      <Button
-        onClick={() => dispatch(handleLogout())}
+  <Button
+  onClick={() => dispatch(handleLogout())}
         variant="outlined"
         sx={{
           color: 'white',

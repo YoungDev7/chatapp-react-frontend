@@ -1,7 +1,4 @@
-/* eslint-disable no-unused-vars */
-// eslint-disable-next-line no-unused-vars
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Buffer } from 'buffer';
 import api from '../../services/Api';
 
 /**
@@ -23,9 +20,13 @@ export const validateToken = createAsyncThunk(
       const response = await api.get('/auth/validateToken');
       return response.data;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error validating token", error);
-      return rejectWithValue(error.response?.data || error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const responseData = (error && typeof error === 'object' && 'response' in error) 
+        ? (error as { response?: { data?: unknown } }).response?.data 
+        : undefined;
+      return rejectWithValue(responseData || errorMessage);
     }
   }
 );
@@ -52,21 +53,35 @@ export const handleLogout = createAsyncThunk(
 }
 );
 
-const parseJWT = (token) => {
+const parseJWT = (token: string) => {
   try {
-    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64'));
+    const base64Payload = token.split('.')[1];
+    const payload = JSON.parse(atob(base64Payload));
+
     return {
       email: payload.sub,
       name: payload.name,
       uid: payload.uid
     };
-  } catch (error) {
-    throw new Error("Error parsing JWT token ", error);
+    
+  } catch (error: unknown) {
+    throw new Error("Error parsing JWT token: " + (error instanceof Error ? error.message : String(error)));
   }
 };
 
+type User = {
+  email: string | null;
+  name: string | null;
+  uid: string | null;
+}
 
-const updateUserFromToken = (state, token) => {
+type AuthState = {
+  token: string | null;
+  user: User;
+  isValidating: boolean;
+}
+
+const updateUserFromToken = (state: AuthState, token: string | null) => {
   if (token) {
     try {
       state.user = parseJWT(token);
@@ -79,7 +94,7 @@ const updateUserFromToken = (state, token) => {
   }
 };
 
-const clearAuthState = (state) => {
+const clearAuthState = (state: AuthState) => {
   state.token = null;
   state.user = { email: null, name: null, uid: null };
   state.isValidating = false;
@@ -144,7 +159,7 @@ const authSlice = createSlice({
         state.isValidating = false;
         updateUserFromToken(state, state.token);
       })
-      .addCase(validateToken.rejected, (state, action) => {
+      .addCase(validateToken.rejected, (state) => {
         clearAuthState(state);
       })
   }

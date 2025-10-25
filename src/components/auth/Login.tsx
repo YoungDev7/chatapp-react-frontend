@@ -12,9 +12,9 @@ import {
   Typography
 } from '@mui/material';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
+import { useAppDispatch } from '../../store/hooks';
 import { setToken, setUser } from '../../store/slices/authSlice';
 
 /**
@@ -28,15 +28,16 @@ import { setToken, setUser } from '../../store/slices/authSlice';
  */
 export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const [isLoginSuccess, setIsLoginSuccess] = useState(null);
+  const [isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setIsLoginSuccess(null);
+
     try {
       // Send login request to the server, implicitly skipping the auth interceptor
       const response = await api.post('/auth/authenticate', credentials, {skipAuthInterceptor: true});
@@ -44,9 +45,11 @@ export default function Login() {
       dispatch(setUser(response.data.access_token));
       setIsLoginSuccess(true);
       navigate('/');
+      
     } catch (error) {
       setIsLoginSuccess(false);
       console.error('Login failed:', error);
+
     } finally {
       setIsLoading(false);
     }

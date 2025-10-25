@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-unused-vars
 import { useLayoutEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setToken, setUser, validateToken } from '../../store/slices/authSlice';
 
 /**
@@ -21,10 +21,10 @@ import { setToken, setUser, validateToken } from '../../store/slices/authSlice';
  * @returns {React.ReactNode} The child components
  */
 // eslint-disable-next-line react/prop-types
-export default function AuthHandler ({ children }) {
+export default function AuthHandler ({ children }: { children: React.ReactNode }) {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const { token, isValidating } = useSelector(state => state.auth);
+    const dispatch = useAppDispatch();
+    const { token } = useAppSelector(state => state.auth);
     
     
     //this interceptor is adding access token to headers until the token is expired

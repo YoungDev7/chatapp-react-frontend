@@ -1,17 +1,28 @@
 /* eslint-disable react/prop-types */
 import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../store/hooks';
 import ChatMessage from './ChatMessage';
 
+type Message = {
+  text: string;
+  senderName: string;
+}
+
+type Props = {
+  messages: Message[];
+}
+
 //this component is container in which all messages are rendered
-const MessageContainer = ({ messages }) => {
-  const containerRef = useRef(null);
-  const { user } = useSelector(state => state.auth); 
+const MessageContainer = ({ messages }: Props) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { user } = useAppSelector(state => state.auth); 
 
   useEffect(() => {
     const container = containerRef.current;
-    container.scrollTop = container.scrollHeight;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages]);
 
   return (

@@ -5,10 +5,10 @@ import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
+import { useAppDispatch } from '../../store/hooks';
 import { setToken, setUser } from '../../store/slices/authSlice';
 
 /**
@@ -30,7 +30,7 @@ import { setToken, setUser } from '../../store/slices/authSlice';
  */
 export default function Register() {
     const [ isSubmitted, setIsSubmitted ] = useState(false);
-    const [ isRegistrationSuccess, setIsRegistrationSuccess ] = useState(null);
+    const [ isRegistrationSuccess, setIsRegistrationSuccess ] = useState<boolean | null>(null);
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -39,8 +39,8 @@ export default function Register() {
     const [passwordConfirmErrorMessage, setPasswordConfirmErrorMessage] = useState('');
     const [nameError, setNameError] = useState(false);
     const [nameErrorMessage, setNameErrorMessage] = useState('');
-    const [isLoginSuccess, setIsLoginSuccess] = useState(null);
-    const dispatch = useDispatch();
+    const [isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({
         username: '',
@@ -100,7 +100,7 @@ export default function Register() {
         }
 
         //username
-        if (!credentials.username || credentials.username < 1) {
+        if (!credentials.username || credentials.username.length < 1) {
             setNameError(true);
             setNameErrorMessage('Name is required.');
             isValid = false;
@@ -112,7 +112,7 @@ export default function Register() {
         return isValid;
     };
      
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         if (!validateInputs()) {
@@ -124,7 +124,7 @@ export default function Register() {
         setIsRegistrationSuccess(null);
 
         try{
-            const response = await api.post('/auth/register', credentials, {skipAuthInterceptor: true});
+            await api.post('/auth/register', credentials, {skipAuthInterceptor: true});
             setIsRegistrationSuccess(true);
             
             try{
@@ -235,7 +235,7 @@ export default function Register() {
                             })}
                             error={nameError}
                             helperText={nameErrorMessage}
-                            color={nameError ? 'error' : 'white'}
+                            color={nameError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
                                 '& .MuiInputLabel-root': { color: 'white' },
@@ -265,7 +265,7 @@ export default function Register() {
                             })}
                             error={emailError}
                             helperText={emailErrorMessage}
-                            color={emailError ? 'error' : 'white'}
+                            color={emailError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
                                 '& .MuiInputLabel-root': { color: 'white' },
@@ -295,7 +295,7 @@ export default function Register() {
                             })}
                             error={passwordError}
                             helperText={passwordErrorMessage}
-                            color={passwordError ? 'error' : 'white'}
+                            color={passwordError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
                                 '& .MuiInputLabel-root': { color: 'white' },
@@ -325,7 +325,7 @@ export default function Register() {
                             })}
                             error={passwordConfirmError}
                             helperText={passwordConfirmErrorMessage}
-                            color={passwordConfirmError ? 'error' : 'white'}
+                            color={passwordConfirmError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
                                 '& .MuiInputLabel-root': { color: 'white' },

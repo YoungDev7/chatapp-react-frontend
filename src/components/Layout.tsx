@@ -2,8 +2,12 @@
 import { Box, Grid } from '@mui/material';
 import Sidebar from './Sidebar';
 
+type Props = {
+  children: React.ReactNode;
+}
+
 // eslint-disable-next-line react/prop-types
-export default function Layout({ children }) {
+export default function Layout({ children }: Props) {
   return (
     <Box sx={{ flexGrow: 1, height: '100vh' }}>
       <Grid container spacing={0} sx={{ height: '100%' }}>

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { Client } from '@stomp/stompjs';
 
 /**
  * WebSocket slice for managing STOMP client connection state.
@@ -13,7 +14,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const wsSlice = createSlice({
   name: 'ws',
   initialState: {
-    stompClient: null,
+    stompClient: null as Client | null,
     connectionStatus: 'disconnected', // 'connecting', 'connected', 'disconnected', 'error'
   },
   reducers: {
@@ -26,5 +27,5 @@ export const wsSlice = createSlice({
   },
 });
 
-export const { stompClient, connectionStatus, setStompClient, setConnectionStatus } = wsSlice.actions;
+export const { setStompClient, setConnectionStatus } = wsSlice.actions;
 export default wsSlice.reducer;

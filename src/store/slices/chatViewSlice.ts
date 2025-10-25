@@ -1,6 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/Api';
 
+type Message = {
+  text: string;
+  senderName: string;
+}
+
+// type ChatView = {
+//   viewId: number;
+//   title: string;
+//   isLoading: boolean;
+//   messages: Message[];
+//   error: string | null;
+// }
+
 /**
  * Async thunk to fetch messages from the API.
  * Currently fetches all messages but is designed to support fetching messages for specific chat views.
@@ -23,14 +36,20 @@ export const fetchMessages = createAsyncThunk(
       //   viewId: chatViewID, 
       //   messages: response.data 
       // };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching messages:', error);
-      return rejectWithValue(error.response?.data || error.message);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const responseData = (error && typeof error === 'object' && 'response' in error) 
+        ? (error as { response?: { data?: unknown } }).response?.data 
+        : undefined;
+      return rejectWithValue(responseData || errorMessage);
     }
   }
 );
 
-const fetchChatViews = createAsyncThunk(
+// Unused for now, left for future use
+/*
+const _fetchChatViews = createAsyncThunk(
   'chatView/fetchChatViews',
   async () => {
     try {
@@ -43,6 +62,7 @@ const fetchChatViews = createAsyncThunk(
     }
   }
 )
+*/
 
 /**
  * Redux slice for managing chat view state.
@@ -58,8 +78,8 @@ const chatViewSlice = createSlice({
             viewId: 1,
             title: 'general',
             isLoading: false,
-            messages: [],
-            error: null
+            messages: [] as Message[],
+            error: null as string | null
         }], 
     },
     reducers: {
@@ -80,12 +100,18 @@ const chatViewSlice = createSlice({
             // }
         },
         addChatView: (state, action) => {
-          state.chatViewCollection.push({ viewId: action.payload.viewId, title: action.payload.title });
+          state.chatViewCollection.push({ 
+            viewId: action.payload.viewId, 
+            title: action.payload.title,
+            isLoading: false,
+            messages: [],
+            error: null
+          });
         }
     },
     extraReducers: (builder) => {
       builder 
-         .addCase(fetchMessages.pending, (state, action) => {
+         .addCase(fetchMessages.pending, (state) => {
             state.chatViewCollection[0].isLoading = true;
             // const chatViewID = action.meta.arg;
             // const view = state.chatViewCollection.find(view => view.viewId === chatViewID);
@@ -105,7 +131,7 @@ const chatViewSlice = createSlice({
           })
           .addCase(fetchMessages.rejected, (state, action) => {
             state.chatViewCollection[0].isLoading = false;
-            state.chatViewCollection[0].error = action.error.message;
+            state.chatViewCollection[0].error = action.error.message || 'Failed to fetch messages';
             // const chatViewID = action.meta.arg;
             // const view = state.chatViewCollection.find(view => view.viewId === chatViewID);
             // if (view) {
