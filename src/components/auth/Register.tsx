@@ -39,7 +39,7 @@ export default function Register() {
     const [passwordConfirmErrorMessage, setPasswordConfirmErrorMessage] = useState('');
     const [nameError, setNameError] = useState(false);
     const [nameErrorMessage, setNameErrorMessage] = useState('');
-    const [isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
+    const [_isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({
