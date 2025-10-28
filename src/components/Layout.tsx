@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import { Box, Grid } from '@mui/material';
+import React from 'react';
 import Sidebar from './Sidebar';
 
 type Props = {

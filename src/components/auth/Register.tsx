@@ -158,16 +158,13 @@ export default function Register() {
 
 
     return (
-        <Container 
+        <Container
             maxWidth="sm"
             sx={{
-                mt: 3,
-                display: 'flex',
-                justifyContent: 'center',
-                flexDirection: 'column'
+                display: 'block'
             }}
         >
-            <Box sx={{ height: 60, mb: 1, display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ height: 60, mb: 0, display: 'flex', alignItems: 'center' }}>
                 {isRegistrationSuccess === false && (
                     <Grow in={!isRegistrationSuccess}>
                         <Alert
@@ -175,7 +172,8 @@ export default function Register() {
                             variant='filled'
                             sx={{
                                 width: '100%',
-                                maxWidth: 400
+                                maxWidth: 400,
+                                mx: 'auto'
                             }} >
                             Registration failed
                         </Alert>
@@ -188,7 +186,8 @@ export default function Register() {
                             variant='filled'
                             sx={{
                                 width: '100%',
-                                maxWidth: 400
+                                maxWidth: 400,
+                                mx: 'auto'
                             }} >
                             Registration successful
                         </Alert>
@@ -202,7 +201,8 @@ export default function Register() {
                     width: '100%',
                     maxWidth: 400,
                     backgroundColor: 'grey.900',
-                    color: 'white'
+                    color: 'white',
+                    mx: 'auto'
                 }}
             >
                 <Typography
@@ -219,7 +219,7 @@ export default function Register() {
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+                    sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}
                 >
                     <FormControl>
                         <TextField
@@ -234,7 +234,7 @@ export default function Register() {
                                 username: e.target.value
                             })}
                             error={nameError}
-                            helperText={nameErrorMessage}
+                            helperText={nameErrorMessage || ' '}
                             color={nameError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
@@ -264,7 +264,7 @@ export default function Register() {
                                 email: e.target.value
                             })}
                             error={emailError}
-                            helperText={emailErrorMessage}
+                            helperText={emailErrorMessage || ' '}
                             color={emailError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
@@ -294,7 +294,7 @@ export default function Register() {
                                 password: e.target.value
                             })}
                             error={passwordError}
-                            helperText={passwordErrorMessage}
+                            helperText={passwordErrorMessage || ' '}
                             color={passwordError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,
@@ -324,7 +324,7 @@ export default function Register() {
                                 passwordConfirm: e.target.value
                             })}
                             error={passwordConfirmError}
-                            helperText={passwordConfirmErrorMessage}
+                            helperText={passwordConfirmErrorMessage || ' '}
                             color={passwordConfirmError ? 'error' : 'primary'}
                             sx={{
                                 mb: 1,

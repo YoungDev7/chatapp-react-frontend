@@ -11,7 +11,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
 import { useAppDispatch } from '../../store/hooks';
@@ -63,13 +63,10 @@ export default function Login() {
   }
 
   return (
-    <Container 
-      maxWidth="sm" 
-      sx={{ 
-        mt: 5, 
-        display: 'flex', 
-        justifyContent: 'center', 
-        flexDirection: 'column'
+    <Container
+      maxWidth="sm"
+      sx={{
+        display: 'block'
       }}
     >
       <Box sx={{ height: 60, mb: 1, display: 'flex', alignItems: 'center' }}>
@@ -80,7 +77,8 @@ export default function Login() {
               variant='filled'
               sx={{
                 width:'100%',
-                maxWidth: 400
+                maxWidth: 400,
+                mx: 'auto'
               }} >
                 Login failed
               </Alert>
@@ -93,7 +91,8 @@ export default function Login() {
               variant='filled'
               sx={{
                 width: '100%',
-                maxWidth: 400
+                maxWidth: 400,
+                mx: 'auto'
               }} >
               Login successful
             </Alert>
@@ -107,7 +106,8 @@ export default function Login() {
           width: '100%',
           maxWidth: 400,
           backgroundColor: 'grey.900',
-          color: 'white'
+          color: 'white',
+          mx: 'auto'
         }}
       >
         <Typography
