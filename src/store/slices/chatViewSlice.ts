@@ -76,7 +76,7 @@ const chatViewSlice = createSlice({
     initialState: {
         chatViewCollection: [{
             viewId: 1,
-            title: 'general',
+            title: 'global',
             isLoading: false,
             messages: [] as Message[],
             error: null as string | null

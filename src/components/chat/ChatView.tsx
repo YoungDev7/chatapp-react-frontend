@@ -1,11 +1,8 @@
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Button,
-  Container,
-  Grid,
-  Paper,
   TextField
 } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -35,7 +32,7 @@ export default function ChatView() {
 
   useEffect(() => {
     dispatch(fetchMessages());
-  }, []);
+  }, [dispatch]);
 
   //websocket message handling
   useEffect(() => {
@@ -51,7 +48,7 @@ export default function ChatView() {
         }
       };
     }
-  }, [stompClient, connectionStatus]);
+  }, [stompClient, connectionStatus, dispatch]);
 
   //SENDING MESSAGE
   function handleMessageSend() {
@@ -65,77 +62,106 @@ export default function ChatView() {
   }
   
   return (
-    <Container 
-      maxWidth={false}
+    <Box 
       sx={{ 
-        maxWidth: '65vw', 
-        height: '90vh', 
-        mt: 2.5,
+        width: '100%',
+        height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        borderRadius: 2,
+        overflow: 'hidden'
       }}
     >
-      <Box sx={{ flexGrow: 1, mb: 2, height: '65vh' }}>
-        <Paper 
-          elevation={1} 
-          sx={{ 
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden' // Prevent Paper from overflowing
-          }}
-        >
-          <MessageContainer messages={chatViewCollection[0]?.messages || []} />
-        </Paper>
+      {/* Title Bar */}
+      <Box
+        sx={{ 
+          height: '55px',
+          backgroundColor: (theme) => theme.palette.custom.secondaryDark,
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          px: 2,
+          gap: 1.5,
+          flexShrink: 0,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          zIndex: 2,
+          boxShadow: '0 6px 24px -2px rgba(0,0,0,0.28)'
+        }}
+      >
+        <FontAwesomeIcon icon={faUsers} size="lg" />
+        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>
+          {chatViewCollection[0]?.title || '{chatview title}'}
+        </Box>
+      </Box>
+
+      {/* Message Container */}
+      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+        <MessageContainer messages={chatViewCollection[0]?.messages || []} />
       </Box>
       
-      <Grid container spacing={1} alignItems="center">
-        <Grid sx={{width: '84%'}}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            type="text"
-            id="inputMessage"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: '#424242',
-                color: 'white',
-                '& fieldset': {
-                  borderColor: '#666',
-                },
-                '&:hover fieldset': {
-                  borderColor: '#888',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#1976d2',
-                },
+      {/* Input Area */}
+      <Box 
+        sx={{ 
+          backgroundColor: (theme) => theme.palette.custom.secondaryDark,
+          display: 'flex',
+          gap: 1,
+          p: 1,
+          flexShrink: 0,
+          alignItems: 'center'
+        }}
+      >
+        <TextField
+          fullWidth
+          placeholder="Aa"
+          variant="outlined"
+          type="text"
+          id="inputMessage"
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleMessageSend();
+            }
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              height: '35px',
+              backgroundColor: '#424242',
+              color: 'white',
+              '& fieldset': {
+                borderColor: '#666',
               },
-              '& .MuiInputBase-input': {
-                color: 'white',
-              }
-            }}
-          />
-        </Grid>
-        <Grid sx={{width: 'max'}}>
-          <Button
-            variant="contained"
-            onClick={handleMessageSend}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              minWidth: 'auto',
-              px: 2,
-              p: 2
-            }}
-          >
-            Send
-            <FontAwesomeIcon icon={faPaperPlane} />
-          </Button>
-        </Grid>
-      </Grid>
-    </Container>
+              '&:hover fieldset': {
+                borderColor: '#888',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#1976d2',
+              },
+            },
+            '& .MuiInputBase-input': {
+              color: 'white',
+              padding: '8px 14px',
+            }
+          }}
+        />
+        <Button
+          variant="contained"
+          onClick={handleMessageSend}
+          sx={{
+            height: '35px',
+            minWidth: 'auto',
+            px: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
+          
+          <FontAwesomeIcon icon={faPaperPlane} />
+        </Button>
+      </Box>
+    </Box>
   );
 }

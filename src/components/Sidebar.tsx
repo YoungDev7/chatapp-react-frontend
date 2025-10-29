@@ -1,14 +1,19 @@
+import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  Box,
   Button,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Paper
+  Paper,
+  Typography
 } from '@mui/material';
 import React from 'react';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
+
 
 /**
  * Sidebar component that provides navigation and user actions.
@@ -21,51 +26,70 @@ import { handleLogout } from '../store/slices/authSlice';
  */
 export default function Sidebar(): React.ReactElement {
   const dispatch = useAppDispatch();
+  const { chatViewCollection } = useAppSelector(state => state.chatView);
 
   return (
-      <Paper
-        elevation={2} 
-        sx={{ 
-          height: '100vh',
-          backgroundColor: 'primary.main',
-          borderRadius: 0,
-          color: 'white',
-          display: 'flex',
-          flexDirection: 'column',
-          boxSizing: 'border-box',
-          p: 2
-        }}
+    <Paper
+      elevation={2} 
+      sx={{ 
+        height: '100%',
+        backgroundColor: (theme) => theme.palette.custom.secondaryDark,
+        borderRadius: 2,
+        color: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        boxSizing: 'border-box',
+        p: 2
+      }}
     >
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="h4" sx={{ fontWeight: 600, color: 'white' }}>
+          Chats
+        </Typography>
+      </Box>
+
       <List sx={{ flexGrow: 1 }}>
-        <ListItem disablePadding>
+        <ListItem 
+          disablePadding
+          sx={{
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: 1,
+            mb: 1
+          }}
+        >
           <ListItemButton 
             href="/"
             sx={{ 
               color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                backgroundColor: 'rgba(255, 255, 255, 0.15)'
               }
             }}
           >
-            <ListItemText primary="Chat" />
+            <FontAwesomeIcon icon={faUsers} size="lg" />
+            <ListItemText primary={chatViewCollection[0].title} />
           </ListItemButton>
         </ListItem>
       </List>
       
-  <Button
-  onClick={() => dispatch(handleLogout())}
-        variant="outlined"
-        sx={{
-          color: 'white',
-          borderColor: 'white',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderColor: 'white'
-          }
-        }}
-      >
-        Logout
+      <Button
+      onClick={() => dispatch(handleLogout())}
+            variant="outlined"
+            sx={{
+              color: 'gray',
+              borderColor: 'gray',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderColor: 'white',
+                color: 'white'
+              }
+            }}
+          >
+            Logout
       </Button>
-    </Paper>
+  </Paper>
   );
 }

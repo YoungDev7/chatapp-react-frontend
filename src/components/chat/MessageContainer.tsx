@@ -29,8 +29,7 @@ const MessageContainer = ({ messages }: Props) => {
     <Box 
       ref={containerRef}
       sx={{
-        backgroundColor: '#6c757d',
-        border: '2px solid #343a40',
+        backgroundColor: (theme) => theme.palette.custom.secondaryDark,
         display: 'flex',
         flexDirection: 'column',
         overflowY: 'auto', // Ensure vertical scrolling

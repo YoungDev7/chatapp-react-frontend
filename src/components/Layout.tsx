@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import { Box, Grid } from '@mui/material';
+import { Box } from '@mui/material';
 import React from 'react';
 import Sidebar from './Sidebar';
 
@@ -7,20 +6,15 @@ type Props = {
   children: React.ReactNode;
 }
 
-// eslint-disable-next-line react/prop-types
 export default function Layout({ children }: Props) {
   return (
-    <Box sx={{ flexGrow: 1, height: '100vh' }}>
-      <Grid container spacing={0} sx={{ height: '100%' }}>
-        <Grid size={3}>
-            <Sidebar />
-        </Grid>
-        <Grid size={9}>
-          <Box sx={{ height: '100%', p: 2 }}>
-            {children}
-          </Box>
-        </Grid>
-      </Grid>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', p: 2, gap: 2, boxSizing: 'border-box' }}>
+      <Box sx={{ width: '30vw', flexShrink: 0 }}>
+        <Sidebar />
+      </Box>
+      <Box sx={{ width: '70vw', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </Box>
     </Box>
   );
 }

@@ -13,6 +13,7 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
+    color: white;
 }
 
 .usersMessageContainer {
@@ -27,16 +28,18 @@
 
 .usersMessageContainer .senderName {
     margin-right: 15px;
+    color: gray;
 }
 
 .othersMessageContainer .senderName {
     margin-left: 15px;
+    color: gray;
 }
 
 .usersMessageContainer .message {
-    background-color: deepskyblue;
+    background-color: #1976d2;
 }
 
 .othersMessageContainer .message {
-    background-color: lightgray;
+    background-color: #4c4c4c;
 }
