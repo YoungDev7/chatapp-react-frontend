@@ -124,39 +124,37 @@ export default function Register() {
         <Container
             maxWidth="sm"
             sx={{
-                display: 'block'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh'
             }}
         >
-            <Box sx={{ height: 60, mb: 0, display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
                 {isRegistrationSuccess === false && (
-                    <Grow in={!isRegistrationSuccess}>
-                        <Alert
-                            severity="error"
-                            variant='filled'
-                            sx={{
-                                width: '100%',
-                                maxWidth: 400,
-                                mx: 'auto'
-                            }} >
-                            Registration failed
-                        </Alert>
-                    </Grow>
+                    <Box sx={{ mb: 2 }}>
+                        <Grow in={!isRegistrationSuccess}>
+                            <Alert
+                                severity="error"
+                                variant='filled'
+                            >
+                                Registration failed
+                            </Alert>
+                        </Grow>
+                    </Box>
                 )}
                 {isRegistrationSuccess === true && (
-                    <Grow in={isRegistrationSuccess}>
-                        <Alert
-                            severity="success"
-                            variant='filled'
-                            sx={{
-                                width: '100%',
-                                maxWidth: 400,
-                                mx: 'auto'
-                            }} >
-                            Registration successful
-                        </Alert>
-                    </Grow>
+                    <Box sx={{ mb: 2 }}>
+                        <Grow in={isRegistrationSuccess}>
+                            <Alert
+                                severity="success"
+                                variant='filled'
+                            >
+                                Registration successful
+                            </Alert>
+                        </Grow>
+                    </Box>
                 )}
-            </Box>
             <Paper
                 elevation={3}
                 sx={{
@@ -300,6 +298,7 @@ export default function Register() {
                     </Link>
                 </Typography>
             </Paper>
+            </Box>
         </Container>
     )
 }
