@@ -10,7 +10,7 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
 import SearchBar from './chat/SearchBar';
@@ -28,6 +28,17 @@ import SearchBar from './chat/SearchBar';
 export default function Sidebar(): React.ReactElement {
   const dispatch = useAppDispatch();
   const { chatViewCollection } = useAppSelector(state => state.chatView);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter chats based on search query
+  const filteredChats = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return chatViewCollection;
+    }
+    return chatViewCollection.filter(chat => 
+      chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [chatViewCollection, searchQuery]);
 
   return (
     <Paper
@@ -50,34 +61,51 @@ export default function Sidebar(): React.ReactElement {
       </Box>
 
       <Box sx={{ mb: 2 }}>
-        <SearchBar />
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
       </Box>
 
-      <List sx={{ flexGrow: 1 }}>
-        <ListItem 
-          disablePadding
-          sx={{
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: 1,
-            mb: 1
-          }}
-        >
-          <ListItemButton 
-            href="/"
+      <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
+        {filteredChats.length > 0 ? (
+          filteredChats.map((chat) => (
+            <ListItem 
+              key={chat.viewId}
+              disablePadding
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: 1,
+                mb: 1
+              }}
+            >
+              <ListItemButton 
+                href="/"
+                sx={{ 
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
+                  }
+                }}
+              >
+                <FontAwesomeIcon icon={faUsers} size="lg" />
+                <ListItemText primary={chat.title} />
+              </ListItemButton>
+            </ListItem>
+          ))
+        ) : (
+          <Box 
             sx={{ 
-              color: 'white',
-              display: 'flex',
+              display: 'flex', 
+              justifyContent: 'center', 
               alignItems: 'center',
-              gap: 1.5,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.15)'
-              }
+              height: '100px',
+              color: 'rgba(255, 255, 255, 0.5)'
             }}
           >
-            <FontAwesomeIcon icon={faUsers} size="lg" />
-            <ListItemText primary={chatViewCollection[0].title} />
-          </ListItemButton>
-        </ListItem>
+            <Typography variant="body2">No matches found</Typography>
+          </Box>
+        )}
       </List>
       
       <Box sx={{ display: 'flex', gap: 1 }}>

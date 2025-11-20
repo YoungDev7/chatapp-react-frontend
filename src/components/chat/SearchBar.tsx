@@ -1,23 +1,30 @@
-import { TextField, InputAdornment } from '@mui/material';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { TextField, InputAdornment, IconButton } from '@mui/material';
+import { faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+
+type Props = {
+  value: string;
+  onChange: (value: string) => void;
+}
 
 /**
  * SearchBar component for filtering chats.
  * 
  * Provides a search input field with a search icon.
- * Currently static, will be connected to search functionality later.
+ * Filters chats by group title or username.
  * 
  * @returns {React.ReactElement} Search bar component
  */
-export default function SearchBar(): React.ReactElement {
+export default function SearchBar({ value, onChange }: Props): React.ReactElement {
   return (
     <TextField
       fullWidth
       placeholder="Search chats..."
       variant="outlined"
       size="small"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
@@ -25,6 +32,24 @@ export default function SearchBar(): React.ReactElement {
               icon={faMagnifyingGlass} 
               style={{ color: 'rgba(255, 255, 255, 0.5)' }} 
             />
+          </InputAdornment>
+        ),
+        endAdornment: value && (
+          <InputAdornment position="end">
+            <IconButton
+              onClick={() => onChange('')}
+              edge="end"
+              size="small"
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.5)',
+                '&:hover': {
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                }
+              }}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </IconButton>
           </InputAdornment>
         ),
       }}
