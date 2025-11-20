@@ -6,6 +6,7 @@ import {
   Container,
   Divider,
   Grow,
+  InputAdornment,
   Link,
   Paper,
   TextField,
@@ -30,6 +31,7 @@ export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -55,6 +57,14 @@ export default function Login() {
     }
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
   let buttonContent;
   if (isLoading) {
     buttonContent = <CircularProgress size={24} sx={{ color: 'white' }} />;
@@ -66,39 +76,37 @@ export default function Login() {
     <Container
       maxWidth="sm"
       sx={{
-        display: 'block'
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh'
       }}
     >
-      <Box sx={{ height: 60, mb: 1, display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
         {isLoginSuccess === false && (
-          <Grow in={!isLoginSuccess}>
-            <Alert 
-              severity="error" 
-              variant='filled'
-              sx={{
-                width:'100%',
-                maxWidth: 400,
-                mx: 'auto'
-              }} >
+          <Box sx={{ mb: 2 }}>
+            <Grow in={!isLoginSuccess}>
+              <Alert 
+                severity="error" 
+                variant='filled'
+              >
                 Login failed
               </Alert>
-          </Grow>
+            </Grow>
+          </Box>
         )}
         {isLoginSuccess === true && (
-          <Grow in={isLoginSuccess}>
-            <Alert
-              severity="success"
-              variant='filled'
-              sx={{
-                width: '100%',
-                maxWidth: 400,
-                mx: 'auto'
-              }} >
-              Login successful
-            </Alert>
-          </Grow>
+          <Box sx={{ mb: 2 }}>
+            <Grow in={isLoginSuccess}>
+              <Alert
+                severity="success"
+                variant='filled'
+              >
+                Login successful
+              </Alert>
+            </Grow>
+          </Box>
         )}
-      </Box>
       <Paper
         elevation={3}
         sx={{
@@ -115,7 +123,8 @@ export default function Login() {
           variant="h4"
           sx={{
             width: '100%',
-            fontSize: 'clamp(2rem, 10vw, 2.15rem)',
+            fontSize: 'clamp(2rem, 10vw, 2rem)',
+            fontWeight: 600,
             mb: 3
           }}
         >
@@ -149,7 +158,7 @@ export default function Login() {
           <TextField
             fullWidth
             label="Password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             disabled={isLoading}
             error={isLoginSuccess === null || isLoginSuccess === true ? false : true}
             value={credentials.password}
@@ -157,6 +166,28 @@ export default function Login() {
               ...credentials,
               password: e.target.value
             })}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    size="small"
+                    sx={{ 
+                      color: 'grey.400',
+                      minWidth: 'auto',
+                      textTransform: 'none',
+                      '&:hover': {
+                        color: 'white',
+                        backgroundColor: 'transparent'
+                      }
+                    }}
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </Button>
+                </InputAdornment>
+              )
+            }}
             sx={{ 
               mb: 3,
               '& .MuiInputLabel-root': { color: 'white' },
@@ -182,23 +213,24 @@ export default function Login() {
 
           <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
 
-          <Typography variant="body2" sx={{ color: 'white', textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ color: 'grey.500', textAlign: 'center' }}>
             Dont have an account?{' '}
             <Link 
               href="/register" 
               sx={{ 
                 color: 'primary.main',
-                textDecoration: 'underline',
+                textDecoration: 'none',
                 '&:hover': {
-                  color: 'primary.light'
+                  textDecoration: 'underline'
                 }
               }}
             >
-              Register now
+              Sign up
             </Link>
           </Typography>
         </Box>
       </Paper>
+      </Box>
     </Container>
   );
 }
