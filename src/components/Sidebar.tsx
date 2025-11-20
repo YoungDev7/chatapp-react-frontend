@@ -1,4 +1,4 @@
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
@@ -80,21 +80,41 @@ export default function Sidebar(): React.ReactElement {
         </ListItem>
       </List>
       
-      <Button
-      onClick={() => dispatch(handleLogout())}
-            variant="outlined"
-            sx={{
-              color: 'gray',
-              borderColor: 'gray',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderColor: 'white',
-                color: 'white'
-              }
-            }}
-          >
-            Logout
-      </Button>
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <Button
+          href="/profile"
+          variant="outlined"
+          sx={{
+            width: '15%',
+            minWidth: 0,
+            color: 'gray',
+            borderColor: 'gray',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'white',
+              color: 'white'
+            }
+          }}
+        >
+          <FontAwesomeIcon icon={faUser} />
+        </Button>
+        <Button
+          onClick={() => dispatch(handleLogout())}
+          variant="outlined"
+          sx={{
+            flex: 1,
+            color: 'gray',
+            borderColor: 'gray',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'white',
+              color: 'white'
+            }
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
   </Paper>
   );
 }

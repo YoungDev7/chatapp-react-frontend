@@ -7,6 +7,7 @@ import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ChatView from './components/chat/ChatView';
 import Layout from './components/Layout';
+import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import WebSocketHandler from './components/WebSocketHandler';
 import theme from './theme';
@@ -30,6 +31,7 @@ function App() {
           }>
             {/*here are child components to be rendered inside of outlet */}
             <Route path="/" element={<ChatView />} /> 
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </ThemeProvider>
