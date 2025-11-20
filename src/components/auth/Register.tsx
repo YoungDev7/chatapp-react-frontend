@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
 import { useAppDispatch } from '../../store/hooks';
 import { setToken, setUser } from '../../store/slices/authSlice';
+import { validateRegistrationInputs } from '../../utils/registerValidation';
+import PasswordField from './PasswordField';
 
 /**
  * Register component that handles user registration.
@@ -65,57 +67,21 @@ export default function Register() {
         setNameError(false);
         setNameErrorMessage('');
     };
-
-    const validateInputs = () => {
-        let isValid = true;
-
-        // email
-        if (!credentials.email || !/\S+@\S+\.\S+/.test(credentials.email)) {
-            setEmailError(true);
-            setEmailErrorMessage('Please enter a valid email address.');
-            isValid = false;
-        } else {
-            setEmailError(false);
-            setEmailErrorMessage('');
-        }
-
-        // password lenght
-        if (!credentials.password || credentials.password.length < 6) {
-            setPasswordError(true);
-            setPasswordErrorMessage('Password must be at least 6 characters long.');
-            isValid = false;
-        } else {
-            setPasswordError(false);
-            setPasswordErrorMessage('');
-        }
-
-        // password confirmation match
-        if (!credentials.password || credentials.password !== credentials.passwordConfirm) {
-            setPasswordConfirmError(true);
-            setPasswordConfirmErrorMessage('Passwords dont match.');
-            isValid = false;
-        } else {
-            setPasswordConfirmError(false);
-            setPasswordConfirmErrorMessage('');
-        }
-
-        //username
-        if (!credentials.username || credentials.username.length < 1) {
-            setNameError(true);
-            setNameErrorMessage('Name is required.');
-            isValid = false;
-        } else {
-            setNameError(false);
-            setNameErrorMessage('');
-        }
-
-        return isValid;
-    };
      
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
-        if (!validateInputs()) {
+        const validation = validateRegistrationInputs(credentials);
+        
+        if (!validation.isValid) {
+            setEmailError(validation.errors.emailError);
+            setEmailErrorMessage(validation.errors.emailErrorMessage);
+            setPasswordError(validation.errors.passwordError);
+            setPasswordErrorMessage(validation.errors.passwordErrorMessage);
+            setPasswordConfirmError(validation.errors.passwordConfirmError);
+            setPasswordConfirmErrorMessage(validation.errors.passwordConfirmErrorMessage);
+            setNameError(validation.errors.nameError);
+            setNameErrorMessage(validation.errors.nameErrorMessage);
             return;
         }
         
@@ -153,9 +119,6 @@ export default function Register() {
     } else {
     buttonContent = 'Register';
     }
-
-
-
 
     return (
         <Container
@@ -279,63 +242,35 @@ export default function Register() {
                         />
                     </FormControl>
                     <FormControl>
-                        <TextField
-                            fullWidth
-                            name="password"
-                            type="password"
-                            id="password"
+                        <PasswordField
                             label="Password"
+                            id="password"
+                            name="password"
                             autoComplete="new-password"
-                            variant="outlined"
                             value={credentials.password}
-                            disabled={isSubmitted}
-                            onChange={(e) => setCredentials({
+                            onChange={(value) => setCredentials({
                                 ...credentials,
-                                password: e.target.value
+                                password: value
                             })}
+                            disabled={isSubmitted}
                             error={passwordError}
                             helperText={passwordErrorMessage || ' '}
-                            color={passwordError ? 'error' : 'primary'}
-                            sx={{
-                                mb: 1,
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiOutlinedInput-root': {
-                                    color: 'white',
-                                    '& fieldset': { borderColor: 'grey.600' },
-                                    '&:hover fieldset': { borderColor: 'grey.400' },
-                                    '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-                                }
-                            }}
                         />
                     </FormControl>
                     <FormControl>
-                        <TextField
-                            fullWidth
-                            type="password"
-                            name="passwordConfirm"
-                            id="passwordConfirm"
+                        <PasswordField
                             label="Confirm Password"
+                            id="passwordConfirm"
+                            name="passwordConfirm"
                             autoComplete="passwordConfirm"
-                            variant="outlined"
                             value={credentials.passwordConfirm}
-                            disabled={isSubmitted}
-                            onChange={(e) => setCredentials({
+                            onChange={(value) => setCredentials({
                                 ...credentials,
-                                passwordConfirm: e.target.value
+                                passwordConfirm: value
                             })}
+                            disabled={isSubmitted}
                             error={passwordConfirmError}
                             helperText={passwordConfirmErrorMessage || ' '}
-                            color={passwordConfirmError ? 'error' : 'primary'}
-                            sx={{
-                                mb: 1,
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiOutlinedInput-root': {
-                                    color: 'white',
-                                    '& fieldset': { borderColor: 'grey.600' },
-                                    '&:hover fieldset': { borderColor: 'grey.400' },
-                                    '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-                                }
-                            }}
                         />
                     </FormControl>
                     <Button

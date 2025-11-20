@@ -6,7 +6,6 @@ import {
   Container,
   Divider,
   Grow,
-  InputAdornment,
   Link,
   Paper,
   TextField,
@@ -17,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/Api';
 import { useAppDispatch } from '../../store/hooks';
 import { setToken, setUser } from '../../store/slices/authSlice';
+import PasswordField from './PasswordField';
 
 /**
  * Login component that handles user authentication.
@@ -31,7 +31,6 @@ export default function Login() {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [isLoginSuccess, setIsLoginSuccess] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -55,14 +54,6 @@ export default function Login() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
   };
 
   let buttonContent;
@@ -155,50 +146,18 @@ export default function Login() {
             InputLabelProps={{ style: { color: 'white' } }}
           />
 
-          <TextField
-            fullWidth
+          <PasswordField
             label="Password"
-            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            value={credentials.password}
+            onChange={(value) => setCredentials({
+              ...credentials,
+              password: value
+            })}
             disabled={isLoading}
             error={isLoginSuccess === null || isLoginSuccess === true ? false : true}
-            value={credentials.password}
-            onChange={(e) => setCredentials({
-              ...credentials,
-              password: e.target.value
-            })}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    onClick={handleClickShowPassword}
-                    onMouseDown={handleMouseDownPassword}
-                    size="small"
-                    sx={{ 
-                      color: 'grey.400',
-                      minWidth: 'auto',
-                      textTransform: 'none',
-                      '&:hover': {
-                        color: 'white',
-                        backgroundColor: 'transparent'
-                      }
-                    }}
-                  >
-                    {showPassword ? 'Hide' : 'Show'}
-                  </Button>
-                </InputAdornment>
-              )
-            }}
-            sx={{ 
-              mb: 3,
-              '& .MuiInputLabel-root': { color: 'white' },
-              '& .MuiOutlinedInput-root': {
-                color: 'white',
-                '& fieldset': { borderColor: 'grey.600' },
-                '&:hover fieldset': { borderColor: 'grey.400' },
-                '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-              }
-            }}
-            InputLabelProps={{ style: { color: 'white' } }}
           />
 
           <Button 
