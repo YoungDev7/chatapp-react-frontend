@@ -13,6 +13,7 @@ import {
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
+import SearchBar from './chat/SearchBar';
 
 
 /**
@@ -46,6 +47,10 @@ export default function Sidebar(): React.ReactElement {
         <Typography variant="h4" sx={{ fontWeight: 600, color: 'white' }}>
           Chats
         </Typography>
+      </Box>
+
+      <Box sx={{ mb: 2 }}>
+        <SearchBar />
       </Box>
 
       <List sx={{ flexGrow: 1 }}>
