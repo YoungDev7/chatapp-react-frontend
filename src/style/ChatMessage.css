@@ -3,16 +3,18 @@
     flex-direction: column;
 }
 
+/* dynamic width */
 .message {
-    padding: 10px 20px;
+    padding: 10px 15px;
     border-radius: 17px;
-    width: max-content;
-    font-size: 120%;
+    width: fit-content;
+    min-width: 40px;
+    font-size: clamp(14px, 2vw, 18px);
     margin: 5px;
-    max-width: 310px;
+    max-width: 70%;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    hyphens: auto;
+    white-space: pre-wrap;
     color: white;
 }
 

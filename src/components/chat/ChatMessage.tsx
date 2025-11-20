@@ -10,6 +10,8 @@ type Props = {
 
 export default function ChatMessage({sender, text, isUser}: Props) {
 
+  // todo: add timestamp
+
   return (
     <div className={`messageContainer ${isUser ? 'usersMessageContainer' : 'othersMessageContainer'}`}>
       <div className="senderName">{sender}</div>
