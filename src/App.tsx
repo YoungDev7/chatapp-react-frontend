@@ -20,6 +20,13 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} /> {/* login page where user gets redirected if not authorized */}
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <WebSocketHandler>
+                <Profile />
+              </WebSocketHandler>
+            </ProtectedRoute>
+          } />
           <Route element={
             <ProtectedRoute>
               <WebSocketHandler>
@@ -31,7 +38,6 @@ function App() {
           }>
             {/*here are child components to be rendered inside of outlet */}
             <Route path="/" element={<ChatView />} /> 
-            <Route path="/profile" element={<Profile />} />
           </Route>
         </Routes>
       </ThemeProvider>

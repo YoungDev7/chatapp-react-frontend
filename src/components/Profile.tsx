@@ -1,4 +1,4 @@
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCamera, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
@@ -8,10 +8,13 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
+  IconButton
 } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
+import AvatarModal from './ui/AvatarModal';
 
 /**
  * Profile component that displays user information.
@@ -22,18 +25,46 @@ import { useAppSelector } from '../store/hooks';
  */
 export default function Profile(): React.ReactElement {
   const { user } = useAppSelector(state => state.auth);
+  const navigate = useNavigate();
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  const handleAvatarSave = (newAvatarUrl: string) => {
+    setAvatarUrl(newAvatarUrl);
+    // TODO: Save avatar to backend
+  };
 
   return (
     <Box
       sx={{
-        height: '100%',
+        height: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: 'column',
         backgroundColor: (theme) => theme.palette.custom.mainDark,
         p: 3
       }}
     >
+      <IconButton
+        onClick={() => navigate('/')}
+        sx={{
+          alignSelf: 'flex-start',
+          mb: 2,
+          color: 'white',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)'
+          }
+        }}
+      >
+        <FontAwesomeIcon icon={faArrowLeft} size="sm" />
+      </IconButton>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1
+        }}
+      >
       <Paper
         elevation={3}
         sx={{
@@ -53,16 +84,38 @@ export default function Profile(): React.ReactElement {
             mb: 3
           }}
         >
-          <Avatar
-            sx={{
-              width: 120,
-              height: 120,
-              backgroundColor: (theme) => theme.palette.primary.main,
-              fontSize: '3rem'
-            }}
-          >
-            <FontAwesomeIcon icon={faUser} />
-          </Avatar>
+          <Box sx={{ position: 'relative' }}>
+            <Avatar
+              src={avatarUrl || undefined}
+              sx={{
+                width: 120,
+                height: 120,
+                backgroundColor: (theme) => theme.palette.primary.main,
+                fontSize: '3rem',
+                border: '1px solid white'
+              }}
+            >
+              {!avatarUrl && <FontAwesomeIcon icon={faUser} />}
+            </Avatar>
+            <IconButton
+              onClick={() => setAvatarModalOpen(true)}
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                backgroundColor: (theme) => theme.palette.primary.main,
+                color: 'white',
+                width: 40,
+                height: 40,
+                border: '1px solid white',
+                '&:hover': {
+                  backgroundColor: (theme) => theme.palette.primary.dark
+                }
+              }}
+            >
+              <FontAwesomeIcon icon={faCamera} />
+            </IconButton>
+          </Box>
         </Box>
 
         <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', mb: 3 }} />
@@ -98,6 +151,14 @@ export default function Profile(): React.ReactElement {
           </ListItem>
         </List>
       </Paper>
+      </Box>
+
+      <AvatarModal
+        open={avatarModalOpen}
+        onClose={() => setAvatarModalOpen(false)}
+        onSave={handleAvatarSave}
+        currentAvatar={avatarUrl || undefined}
+      />
     </Box>
   );
 }
