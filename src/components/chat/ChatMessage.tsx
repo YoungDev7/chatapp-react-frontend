@@ -1,19 +1,14 @@
 import '../../style/ChatMessage.css';
+import type { ChatMessageProps } from '../../types/chatMessage';
 
-type Props = {
-  sender: string;
-  text: string;
-  isUser: boolean;
-}
-
-export default function ChatMessage({sender, text, isUser}: Props) {
+export default function ChatMessage({sender, text, isUser, showSender}: ChatMessageProps) {
 
   // todo: add timestamp
 
   return (
-    <div className={`messageContainer ${isUser ? 'usersMessageContainer' : 'othersMessageContainer'}`}>
-      <div className="senderName">{sender}</div>
-      <div className="message">{text}</div>
+    <div className={`message ${isUser ? 'usersMessage' : 'othersMessage'} ${!showSender ? 'groupedMessage' : ''}`}>
+      {showSender && <div className="senderName">{isUser ? 'you' : sender}</div>}
+      <div className="messageText">{text}</div>
     </div>
   )
 

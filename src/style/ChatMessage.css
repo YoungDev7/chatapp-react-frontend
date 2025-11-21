@@ -1,47 +1,54 @@
-.messageContainer {
+.message {
     display: flex;
     flex-direction: column;
+    margin-bottom: 2px;
+    max-width: 60%;
 }
 
-/* dynamic width */
-.message {
-    padding: 10px 15px;
+.groupedMessage {
+    margin-top: 2px;
+}
+
+/* message text bubble */
+.messageText {
+    padding: 8px 12px;
     border-radius: 17px;
     width: fit-content;
-    min-width: 40px;
     font-size: clamp(14px, 2vw, 18px);
-    margin: 5px;
-    max-width: 70%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
+    margin: 2px 5px;
     color: white;
 }
 
-.usersMessageContainer {
+.usersMessage {
     align-self: flex-end;
     align-items: flex-end;
 }
 
-.othersMessageContainer {
+.othersMessage {
     align-self: flex-start;
     align-items: flex-start;
 }
 
-.usersMessageContainer .senderName {
+.usersMessage .senderName {
     margin-right: 15px;
+    margin-bottom: 4px;
+    margin-top: 8px;
     color: gray;
+    font-size: 13px;
 }
 
-.othersMessageContainer .senderName {
+.othersMessage .senderName {
     margin-left: 15px;
+    margin-bottom: 4px;
+    margin-top: 8px;
     color: gray;
+    font-size: 13px;
 }
 
-.usersMessageContainer .message {
+.usersMessage .messageText {
     background-color: #1976d2;
 }
 
-.othersMessageContainer .message {
+.othersMessage .messageText {
     background-color: #4c4c4c;
 }
