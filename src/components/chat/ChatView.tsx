@@ -1,13 +1,15 @@
-import { faPaperPlane, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faPaperPlane, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Button,
+  IconButton,
   TextField
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
+import { useLayout } from '../Layout';
 import MessageContainer from './MessageContainer';
 
 /**
@@ -29,6 +31,7 @@ export default function ChatView() {
   const { chatViewCollection } = useAppSelector(state => state.chatView);
   const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
   const dispatch = useAppDispatch();
+  const { toggleDrawer, isMobile } = useLayout();
 
   useEffect(() => {
     dispatch(fetchMessages());
@@ -89,6 +92,21 @@ export default function ChatView() {
           boxShadow: '0 6px 24px -2px rgba(0,0,0,0.28)'
         }}
       >
+        {isMobile && (
+          <IconButton
+            onClick={toggleDrawer}
+            sx={{
+              color: 'white',
+              width: 36,
+              height: 36,
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              }
+            }}
+          >
+            <FontAwesomeIcon icon={faBars} />
+          </IconButton>
+        )}
         <FontAwesomeIcon icon={faUsers} size="lg" />
         <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>
           {chatViewCollection[0]?.title || '{chatview title}'}

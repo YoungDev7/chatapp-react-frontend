@@ -25,7 +25,7 @@ import SearchBar from './chat/SearchBar';
  * 
  * @returns {React.ReactElement} Sidebar navigation component
  */
-export default function Sidebar(): React.ReactElement {
+export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): React.ReactElement {
   const dispatch = useAppDispatch();
   const { chatViewCollection } = useAppSelector(state => state.chatView);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,11 +42,11 @@ export default function Sidebar(): React.ReactElement {
 
   return (
     <Paper
-      elevation={2} 
+      elevation={isMobile ? 0 : 2} 
       sx={{ 
         height: '100%',
         backgroundColor: (theme) => theme.palette.custom.secondaryDark,
-        borderRadius: 2,
+        borderRadius: isMobile ? 0 : 2,
         color: 'white',
         display: 'flex',
         flexDirection: 'column',
