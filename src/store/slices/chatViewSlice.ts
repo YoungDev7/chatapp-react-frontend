@@ -28,9 +28,9 @@ type Message = {
  */
 export const fetchMessages = createAsyncThunk(
     'chatView/fetchMessages',
-  async (_, /*chatViewID,*/ { rejectWithValue }) => {
+  async (chatViewId: string = '1', { rejectWithValue }) => {
     try {
-      const response = await api.get('/messages');
+      const response = await api.get(`/chatviews/${chatViewId}/messages`);
       return response.data;
       // return { 
       //   viewId: chatViewID, 

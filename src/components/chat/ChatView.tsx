@@ -34,13 +34,15 @@ export default function ChatView() {
   const { toggleDrawer, isMobile } = useLayout();
 
   useEffect(() => {
-    dispatch(fetchMessages());
+    dispatch(fetchMessages('1')); // Fetch messages for global chat
   }, [dispatch]);
 
   //websocket message handling
   useEffect(() => {
     if (stompClient && connectionStatus === 'connected') {
-      const subscription = stompClient.subscribe('/topic/messages', (message: { body: string }) => {
+      const chatViewId = '1'; // Global chat
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const subscription = stompClient.subscribe(`/topic/chatview.${chatViewId}.user.${user.uid}`, (message: { body: string }) => {
         const newMessage = JSON.parse(message.body);
         dispatch(addMessage(newMessage));
       });
@@ -56,9 +58,10 @@ export default function ChatView() {
   //SENDING MESSAGE
   function handleMessageSend() {
     if (stompClient && connectionStatus === 'connected') {
+      const chatViewId = '1'; // Global chat
       stompClient.publish({
-        destination: "/app/chat",
-        body: JSON.stringify({ text: inputMessage})
+        destination: `/app/chatview/${chatViewId}`,
+        body: JSON.stringify({ text: inputMessage, createdAt: new Date().toISOString() })
       });
       setInputMessage('');
     }
