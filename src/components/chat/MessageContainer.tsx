@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import type { MessageContainerProps } from '../../types/messageContainer';
+import { formatMessageTimestamp, shouldShowTimestamp } from '../../utils/timestampUtils';
 import ChatMessage from './ChatMessage';
 
 //this component is container in which all messages are rendered
@@ -16,6 +17,21 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
     }
   }, [messages]);
 
+  if (!messages || !Array.isArray(messages)) {
+    return (
+      <Box 
+        sx={{
+          backgroundColor: (theme) => theme.palette.custom.secondaryDark,
+          display: 'flex',
+          flexDirection: 'column',
+          overflowY: 'auto',
+          height: '100%',
+          minHeight: 0
+        }}
+      />
+    );
+  }
+
   return (
     <Box 
       ref={containerRef}
@@ -29,18 +45,56 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
       }}
     >
       {messages.map((message, index) => {
-        // Check if this is the first message or if the sender is different from the previous message
-        const showSender = index === 0 || messages[index - 1].senderName !== message.senderName;
+        // Skip messages without required fields (silently)
+        if (!message || !message.senderName || !message.text) {
+          return null;
+        }
         
-        return (
-          <ChatMessage 
-            key={index} 
-            text={message.text} 
-            sender={message.senderName} 
-            isUser={message.senderName === user.name} 
-            showSender={showSender}
-          />
-        );
+        try {
+          // Check if this is the first message or if the sender is different from the previous message
+          const showSender = index === 0 || messages[index - 1]?.senderName !== message.senderName;
+          
+          // Determine if timestamp should be shown (only if createdAt exists)
+          let showTimestamp = false;
+          if (message.createdAt) {
+            const previousMessage = index > 0 ? messages[index - 1] : null;
+            showTimestamp = shouldShowTimestamp(
+              message.createdAt,
+              previousMessage?.createdAt || null,
+              message.senderName,
+              previousMessage?.senderName || null
+            );
+          }
+          
+          return (
+            <>
+              {showTimestamp && message.createdAt && (
+                <Box
+                  sx={{
+                    textAlign: 'center',
+                    fontSize: '11px',
+                    color: '#999',
+                    margin: '12px 0 8px 0'
+                  }}
+                >
+                  {formatMessageTimestamp(message.createdAt)}
+                </Box>
+              )}
+              <ChatMessage 
+                key={`message-${index}-${message.senderName}`}
+                text={message.text} 
+                sender={message.senderName} 
+                isUser={message.senderName === user.name} 
+                showSender={showSender}
+                timestamp={undefined}
+                showTimestamp={false}
+              />
+            </>
+          );
+        } catch (error) {
+          console.error('Error rendering message at index', index, error, message);
+          return null;
+        }
       })}
     </Box>
   );

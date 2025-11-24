@@ -52,3 +52,18 @@
 .othersMessage .messageText {
     background-color: #4c4c4c;
 }
+
+/* timestamp styling */
+.messageTimestamp {
+    font-size: 11px;
+    color: #999;
+    margin: 2px 15px 4px;
+}
+
+.usersMessage .messageTimestamp {
+    text-align: right;
+}
+
+.othersMessage .messageTimestamp {
+    text-align: left;
+}
