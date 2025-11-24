@@ -1,15 +1,10 @@
-import { faBars, faPaperPlane, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  Box,
-  Button,
-  IconButton,
-  TextField
-} from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box } from '@mui/material';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addMessage, fetchMessages } from '../../store/slices/chatViewSlice';
 import { useLayout } from '../Layout';
+import ChatHeader from './ChatHeader';
+import ChatInput from './ChatInput';
 import MessageContainer from './MessageContainer';
 
 /**
@@ -27,7 +22,6 @@ import MessageContainer from './MessageContainer';
  * @returns {React.ReactElement} Chat interface with message display and input
  */
 export default function ChatView() {
-  const [inputMessage, setInputMessage] = useState('');
   const { chatViewCollection } = useAppSelector(state => state.chatView);
   const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
   const dispatch = useAppDispatch();
@@ -56,14 +50,13 @@ export default function ChatView() {
   }, [stompClient, connectionStatus, dispatch]);
 
   //SENDING MESSAGE
-  function handleMessageSend() {
-    if (stompClient && connectionStatus === 'connected' && inputMessage.trim().length > 0) {
+  function handleMessageSend(message: string) {
+    if (stompClient && connectionStatus === 'connected') {
       const chatViewId = '1'; // Global chat
       stompClient.publish({
         destination: `/app/chatview/${chatViewId}`,
-        body: JSON.stringify({ text: inputMessage, createdAt: new Date().toISOString() })
+        body: JSON.stringify({ text: message, createdAt: new Date().toISOString() })
       });
-      setInputMessage('');
     }
   }
   
@@ -79,42 +72,11 @@ export default function ChatView() {
       }}
     >
       {/* Title Bar */}
-      <Box
-        sx={{ 
-          height: '55px',
-          backgroundColor: (theme) => theme.palette.custom.secondaryDark,
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          px: 2,
-          gap: 1.5,
-          flexShrink: 0,
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
-          zIndex: 2,
-          boxShadow: '0 6px 24px -2px rgba(0,0,0,0.28)'
-        }}
-      >
-        {isMobile && (
-          <IconButton
-            onClick={toggleDrawer}
-            sx={{
-              color: 'white',
-              width: 36,
-              height: 36,
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              }
-            }}
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </IconButton>
-        )}
-        <FontAwesomeIcon icon={faUsers} size="lg" />
-        <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>
-          {chatViewCollection[0]?.title || '{chatview title}'}
-        </Box>
-      </Box>
+      <ChatHeader 
+        title={chatViewCollection[0]?.title || '{chatview title}'}
+        isMobile={isMobile}
+        onMenuClick={toggleDrawer}
+      />
 
       {/* Message Container */}
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
@@ -122,68 +84,10 @@ export default function ChatView() {
       </Box>
       
       {/* Input Area */}
-      <Box 
-        sx={{ 
-          backgroundColor: (theme) => theme.palette.custom.secondaryDark,
-          display: 'flex',
-          gap: 1,
-          p: 1,
-          flexShrink: 0,
-          alignItems: 'center'
-        }}
-      >
-        <TextField
-          fullWidth
-          placeholder="Aa"
-          variant="outlined"
-          type="text"
-          id="inputMessage"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleMessageSend();
-            }
-          }}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              height: '35px',
-              backgroundColor: '#424242',
-              color: 'white',
-              '& fieldset': {
-                borderColor: '#666',
-              },
-              '&:hover fieldset': {
-                borderColor: '#888',
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: '#1976d2',
-              },
-            },
-            '& .MuiInputBase-input': {
-              color: 'white',
-              padding: '8px 14px',
-            }
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={handleMessageSend}
-          disabled={inputMessage.trim().length === 0}
-          sx={{
-            height: '35px',
-            minWidth: 'auto',
-            px: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-          }}
-        >
-          
-          <FontAwesomeIcon icon={faPaperPlane} />
-        </Button>
-      </Box>
+      <ChatInput 
+        onSendMessage={handleMessageSend}
+        disabled={connectionStatus !== 'connected'}
+      />
     </Box>
   );
 }
