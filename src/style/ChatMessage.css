@@ -2,11 +2,31 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 2px;
-    max-width: 60%;
+    max-width: 70%;
+}
+
+.messageRow {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.messageContent {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .groupedMessage {
     margin-top: 2px;
+}
+
+.groupedMessage .messageRow {
+    /* No extra margin needed - avatar space is preserved with visibility:hidden */
+}
+
+.usersMessage.groupedMessage .messageRow {
+    /* No extra margin for user messages */
 }
 
 /* message text bubble */

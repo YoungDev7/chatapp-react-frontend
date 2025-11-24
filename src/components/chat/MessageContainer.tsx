@@ -45,16 +45,19 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
       }}
     >
       {messages.map((message, index) => {
-        // Skip messages without required fields (silently)
         if (!message || !message.senderName || !message.text) {
           return null;
         }
         
         try {
-          // Check if this is the first message or if the sender is different from the previous message
           const showSender = index === 0 || messages[index - 1]?.senderName !== message.senderName;
           
-          // Determine if timestamp should be shown (only if createdAt exists)
+          const isLastInGroup = 
+            index === messages.length - 1 || 
+            messages[index + 1]?.senderName !== message.senderName; 
+          
+          const showAvatar = isLastInGroup;
+          
           let showTimestamp = false;
           if (message.createdAt) {
             const previousMessage = index > 0 ? messages[index - 1] : null;
@@ -86,6 +89,7 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
                 sender={message.senderName} 
                 isUser={message.senderName === user.name} 
                 showSender={showSender}
+                showAvatar={showAvatar}
                 timestamp={undefined}
                 showTimestamp={false}
               />
