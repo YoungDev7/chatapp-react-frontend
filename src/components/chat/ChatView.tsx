@@ -57,7 +57,7 @@ export default function ChatView() {
 
   //SENDING MESSAGE
   function handleMessageSend() {
-    if (stompClient && connectionStatus === 'connected') {
+    if (stompClient && connectionStatus === 'connected' && inputMessage.trim().length > 0) {
       const chatViewId = '1'; // Global chat
       stompClient.publish({
         destination: `/app/chatview/${chatViewId}`,
@@ -170,6 +170,7 @@ export default function ChatView() {
         <Button
           variant="contained"
           onClick={handleMessageSend}
+          disabled={inputMessage.trim().length === 0}
           sx={{
             height: '35px',
             minWidth: 'auto',
