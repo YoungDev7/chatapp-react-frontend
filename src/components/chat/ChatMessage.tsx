@@ -2,9 +2,12 @@ import { Avatar } from '@mui/material';
 import '../../style/ChatMessage.css';
 import type { ChatMessageProps } from '../../types/chatMessage';
 import { getAvatarColor, getAvatarInitial } from '../../utils/avatarUtils';
+import { isEmojiOnly } from '../../utils/emojiUtils';
 import { formatMessageTimestamp } from '../../utils/timestampUtils';
 
 export default function ChatMessage({sender, text, isUser, showSender, showAvatar, timestamp, showTimestamp}: ChatMessageProps) {
+  const isEmojiOnlyMessage = isEmojiOnly(text);
+  
   return (
     <div className={`message ${isUser ? 'usersMessage' : 'othersMessage'} ${!showSender ? 'groupedMessage' : ''}`}>
       <div className="messageRow">
@@ -25,7 +28,7 @@ export default function ChatMessage({sender, text, isUser, showSender, showAvata
         )}
         <div className="messageContent">
           {showSender && <div className="senderName">{isUser ? 'you' : sender}</div>}
-          <div className="messageText">{text}</div>
+          <div className={`messageText ${isEmojiOnlyMessage ? 'emojiOnly' : ''}`}>{text}</div>
           {showTimestamp && timestamp && (
             <div className="messageTimestamp">{formatMessageTimestamp(timestamp)}</div>
           )}
