@@ -2,7 +2,8 @@ import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
-  Button
+  Button,
+  TextField
 } from '@mui/material';
 import React, { useState } from 'react';
 import BaseModal from '../ui/BaseModal';
@@ -17,37 +18,33 @@ type Props = {
 /**
  * AvatarModal component for changing user avatar.
  * 
- * Allows users to upload a new avatar image.
+ * Allows users to provide an avatar URL.
  * 
  * @returns {React.ReactElement} Avatar change modal
  */
 export default function AvatarModal({ open, onClose, onSave }: Props): React.ReactElement {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [previewError, setPreviewError] = useState(false);
 
   const handleSave = () => {
-    if (previewUrl) {
-      onSave(previewUrl);
+    if (avatarUrl.trim()) {
+      onSave(avatarUrl.trim());
       handleClose();
     }
   };
 
   const handleClose = () => {
-    setSelectedFile(null);
-    setPreviewUrl(null);
+    setAvatarUrl('');
+    setPreviewError(false);
     onClose();
+  };
+
+  const handleImageError = () => {
+    setPreviewError(true);
+  };
+
+  const handleImageLoad = () => {
+    setPreviewError(false);
   };
 
   return (
@@ -77,10 +74,12 @@ export default function AvatarModal({ open, onClose, onSave }: Props): React.Rea
             border: '2px solid rgba(255, 255, 255, 0.2)'
           }}
         >
-          {previewUrl ? (
+          {avatarUrl && !previewError ? (
             <img
-              src={previewUrl}
+              src={avatarUrl}
               alt="Avatar preview"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
               style={{
                 width: '100%',
                 height: '100%',
@@ -96,26 +95,46 @@ export default function AvatarModal({ open, onClose, onSave }: Props): React.Rea
           )}
         </Box>
 
-        <Button
+        <TextField
+          fullWidth
+          label="Avatar URL"
           variant="outlined"
-          component="label"
-          sx={{
-            color: 'white',
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-            '&:hover': {
-              borderColor: 'white',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+          value={avatarUrl}
+          onChange={(e) => setAvatarUrl(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleSave();
             }
           }}
-        >
-          Choose Image
-          <input
-            type="file"
-            hidden
-            accept="image/*"
-            onChange={handleFileSelect}
-          />
-        </Button>
+          autoFocus
+          placeholder="https://example.com/avatar.jpg"
+          error={previewError}
+          helperText={previewError ? 'Invalid image URL' : ''}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              color: 'white',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#1976d2',
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: 'rgba(255, 255, 255, 0.7)',
+            },
+            '& .MuiInputLabel-root.Mui-focused': {
+              color: '#1976d2',
+            },
+            '& .MuiFormHelperText-root': {
+              color: '#f44336',
+            },
+          }}
+        />
 
         <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
           <Button
@@ -138,7 +157,7 @@ export default function AvatarModal({ open, onClose, onSave }: Props): React.Rea
             variant="contained"
             onClick={handleSave}
             fullWidth
-            disabled={!selectedFile}
+            disabled={!avatarUrl.trim() || previewError}
             sx={{
               '&:disabled': {
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
