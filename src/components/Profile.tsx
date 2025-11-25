@@ -14,7 +14,7 @@ import {
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
-import AvatarModal from './ui/AvatarModal';
+import AvatarModal from './chat/AvatarModal';
 
 /**
  * Profile component that displays user information.

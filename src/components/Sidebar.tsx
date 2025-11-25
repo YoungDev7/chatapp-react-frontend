@@ -13,6 +13,8 @@ import {
 import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
+import NewChatButton from './chat/NewChatButton';
+import NewChatModal from './chat/NewChatModal';
 import SearchBar from './chat/SearchBar';
 
 
@@ -29,6 +31,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
   const dispatch = useAppDispatch();
   const { chatViewCollection } = useAppSelector(state => state.chatView);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
 
   // Filter chats based on search query
   const filteredChats = useMemo(() => {
@@ -39,6 +42,11 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
       chat.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [chatViewCollection, searchQuery]);
+
+  const handleCreateChat = (chatName: string) => {
+    // TODO: Implement create chat logic
+    console.log('Creating chat:', chatName);
+  };
 
   return (
     <Paper
@@ -60,9 +68,16 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
         </Typography>
       </Box>
 
-      <Box sx={{ mb: 2 }}>
+      <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <NewChatButton onClick={() => setIsNewChatModalOpen(true)} />
       </Box>
+
+      <NewChatModal
+        open={isNewChatModalOpen}
+        onClose={() => setIsNewChatModalOpen(false)}
+        onCreateChat={handleCreateChat}
+      />
 
       <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
         {filteredChats.length > 0 ? (

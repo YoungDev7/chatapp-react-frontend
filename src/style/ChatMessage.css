@@ -21,14 +21,6 @@
     margin-top: 2px;
 }
 
-.groupedMessage .messageRow {
-    /* No extra margin needed - avatar space is preserved with visibility:hidden */
-}
-
-.usersMessage.groupedMessage .messageRow {
-    /* No extra margin for user messages */
-}
-
 /* message text bubble */
 .messageText {
     padding: 8px 12px;
