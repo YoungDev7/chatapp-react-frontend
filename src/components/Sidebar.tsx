@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { handleLogout } from '../store/slices/authSlice';
 import NewChatButton from './chat/NewChatButton';
 import NewChatModal from './chat/NewChatModal';
-import SearchBar from './chat/SearchBar';
+import SearchBar from './ui/SearchBar';
 
 
 /**
