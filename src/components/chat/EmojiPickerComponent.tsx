@@ -14,7 +14,8 @@ export default function EmojiPickerComponent({ onEmojiClick, emojiPickerRef }: E
       sx={{
         position: 'absolute',
         bottom: '50px',
-        left: '10px',
+        right: { xs: '50%', sm: '60px' },
+        transform: { xs: 'translateX(50%)', sm: 'none' },
         zIndex: 1000
       }}
     >
@@ -29,6 +30,7 @@ export default function EmojiPickerComponent({ onEmojiClick, emojiPickerRef }: E
         skinTonesDisabled={true}
         autoFocusSearch={true}
         lazyLoadEmojis={true}
+        width={300}
       />
     </Box>
   );
