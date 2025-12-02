@@ -5,8 +5,8 @@ import {
   Button,
   TextField
 } from '@mui/material';
-import React, { useState } from 'react';
-import BaseModal from '../ui/BaseModal';
+import React, { useState, useEffect } from 'react';
+import BaseModal from './ui/BaseModal';
 
 type Props = {
   open: boolean;
@@ -22,9 +22,15 @@ type Props = {
  * 
  * @returns {React.ReactElement} Avatar change modal
  */
-export default function AvatarModal({ open, onClose, onSave }: Props): React.ReactElement {
-  const [avatarUrl, setAvatarUrl] = useState('');
+export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Props): React.ReactElement {
+  const [avatarUrl, setAvatarUrl] = useState(currentAvatar || '');
   const [previewError, setPreviewError] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setAvatarUrl(currentAvatar || '');
+    }
+  }, [open, currentAvatar]);
 
   const handleSave = () => {
     if (avatarUrl.trim()) {

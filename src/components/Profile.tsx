@@ -11,10 +11,12 @@ import {
   ListItemText,
   IconButton
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../store/hooks';
-import AvatarModal from './chat/AvatarModal';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { setAvatar } from '../store/slices/authSlice';
+import api from '../services/Api';
+import AvatarModal from './AvatarModal';
 
 /**
  * Profile component that displays user information.
@@ -25,13 +27,46 @@ import AvatarModal from './chat/AvatarModal';
  */
 export default function Profile(): React.ReactElement {
   const { user } = useAppSelector(state => state.auth);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  const handleAvatarSave = (newAvatarUrl: string) => {
-    setAvatarUrl(newAvatarUrl);
-    // TODO: Save avatar to backend
+  const fetchAvatar = useCallback(async () => {
+    try {
+      const response = await api.get('/user/avatar');
+      if (response.data) {
+        setAvatarUrl(response.data);
+        dispatch(setAvatar(response.data));
+      }
+    } catch (error) {
+      console.error('Error fetching avatar:', error);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Load avatar from Redux state or fetch from backend
+    if (user.avatarLink) {
+      setAvatarUrl(user.avatarLink);
+    } else {
+      fetchAvatar();
+    }
+  }, [user.avatarLink, fetchAvatar]);
+
+  const handleAvatarSave = async (newAvatarUrl: string) => {
+    try {
+      // Spring Boot @RequestBody String expects a JSON string (with quotes)
+      await api.patch('/user/avatar', JSON.stringify(newAvatarUrl), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setAvatarUrl(newAvatarUrl);
+      dispatch(setAvatar(newAvatarUrl));
+    } catch (error) {
+      console.error('Error saving avatar:', error);
+      alert('Failed to save avatar. Please try again.');
+    }
   };
 
   return (

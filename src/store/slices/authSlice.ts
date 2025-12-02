@@ -73,6 +73,7 @@ type User = {
   email: string | null;
   name: string | null;
   uid: string | null;
+  avatarLink?: string | null;
 }
 
 type AuthState = {
@@ -87,16 +88,16 @@ const updateUserFromToken = (state: AuthState, token: string | null) => {
       state.user = parseJWT(token);
     } catch (error) {
       console.error(error);
-      state.user = { email: null, name: null, uid: null };
+      state.user = { email: null, name: null, uid: null, avatarLink: null };
     }
   } else {
-    state.user = { email: null, name: null, uid: null };
+    state.user = { email: null, name: null, uid: null, avatarLink: null };
   }
 };
 
 const clearAuthState = (state: AuthState) => {
   state.token = null;
-  state.user = { email: null, name: null, uid: null };
+  state.user = { email: null, name: null, uid: null, avatarLink: null };
   state.isValidating = false;
   localStorage.removeItem('accessToken');
   localStorage.removeItem('user');
@@ -125,7 +126,8 @@ const authSlice = createSlice({
     user: {
       email: null,
       name: null,
-      uid: null
+      uid: null,
+      avatarLink: null
     },
     isValidating: true,
   },
@@ -155,6 +157,12 @@ const authSlice = createSlice({
       const token = action.payload;
       updateUserFromToken(state, token);
     },
+    setAvatar: (state, action) => {
+      state.user.avatarLink = action.payload;
+      if (state.user.uid) {
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -174,5 +182,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { setToken, setUser, clearAuth, setValidating } = authSlice.actions;
+export const { setToken, setUser, clearAuth, setValidating, setAvatar } = authSlice.actions;
 export default authSlice.reducer;
