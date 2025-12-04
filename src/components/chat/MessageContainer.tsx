@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import type { MessageContainerProps } from '../../types/messageContainer';
+import type { MessageContainerProps } from '../../types/messageContainerProps';
 import { formatMessageTimestamp, shouldShowTimestamp } from '../../utils/timestampUtils';
 import ChatMessage from './ChatMessage';
 
@@ -9,6 +9,8 @@ import ChatMessage from './ChatMessage';
 const MessageContainer = ({ messages }: MessageContainerProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const { user } = useAppSelector(state => state.auth); 
+  const userAvatars = useAppSelector(state => state.chatView.userAvatars);
+
 
   useEffect(() => {
     const container = containerRef.current;
@@ -68,6 +70,9 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
               previousMessage?.senderName || null
             );
           }
+
+          const senderAvatarLink = userAvatars.get(message.senderUid) || '';
+
           
           return (
             <>
@@ -87,6 +92,8 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
                 key={`message-${index}-${message.senderName}`}
                 text={message.text} 
                 sender={message.senderName} 
+                senderUid={message.senderUid}
+                senderAvatarLink={senderAvatarLink}
                 isUser={message.senderName === user.name} 
                 showSender={showSender}
                 showAvatar={showAvatar}

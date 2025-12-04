@@ -1,6 +1,6 @@
 import { Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
 import React, { createContext, useContext, useState } from 'react';
-import Sidebar from './Sidebar';
+import Sidebar from './sidebar/Sidebar';
 
 type Props = {
   children: React.ReactNode;
