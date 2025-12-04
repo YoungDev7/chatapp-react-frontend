@@ -98,7 +98,7 @@ const clearAuthState = (state: AuthState) => {
   state.token = null;
   state.user = { email: null, name: null, uid: null };
   state.isValidating = false;
-  localStorage.removeItem('accessToken');
+  localStorage.clear();
 };
 
 /**

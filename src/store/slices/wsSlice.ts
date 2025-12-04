@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { Client, StompSubscription } from '@stomp/stompjs';
+import { clearAuth } from './authSlice';
 
 /**
  * WebSocket slice for managing STOMP client connection state.
@@ -12,13 +13,15 @@ import type { Client, StompSubscription } from '@stomp/stompjs';
  * This slice is used by WebSocketHandler component to store and track
  * the WebSocket connection state across the application.
  */
+const initialState = {
+  stompClient: null as Client | null,
+  connectionStatus: 'disconnected' as 'connecting' | 'connected' | 'disconnected' | 'error',
+  subscriptions: new Map<string, StompSubscription>(),
+};
+
 export const wsSlice = createSlice({
   name: 'ws',
-  initialState: {
-    stompClient: null as Client | null,
-    connectionStatus: 'disconnected', // 'connecting', 'connected', 'disconnected', 'error'
-    subscriptions: new Map<string, StompSubscription>(), // Map of viewId -> subscription
-  },
+  initialState,
   reducers: {
     setStompClient: (state, action) => {
         state.stompClient = action.payload;
@@ -42,6 +45,23 @@ export const wsSlice = createSlice({
         });
         state.subscriptions.clear();
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Clear WebSocket state on logout
+      .addCase(clearAuth, (state) => {
+        // Unsubscribe from all active subscriptions before clearing
+        state.subscriptions.forEach(sub => {
+          if (sub && typeof sub.unsubscribe === 'function') {
+            sub.unsubscribe();
+          }
+        });
+        // Disconnect the STOMP client if connected
+        if (state.stompClient && state.stompClient.connected) {
+          state.stompClient.deactivate();
+        }
+        return initialState;
+      });
   },
 });
 

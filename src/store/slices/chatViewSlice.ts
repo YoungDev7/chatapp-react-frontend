@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/Api';
 import type { ChatView } from '../../types/chatView';
+import { clearAuth } from './authSlice';
 
 
 type ChatViewState = {
@@ -10,6 +11,14 @@ type ChatViewState = {
   userAvatars: Map<string, string>,
   error: string | null
 }
+
+const initialState: ChatViewState = {
+  chatViewCollection: [], 
+  isLoadingChatViews: true,
+  currentlyDisplayedChatView: "1",
+  userAvatars: new Map<string, string>(),
+  error: null
+};
 
 /**
  * Async thunk to fetch messages from the API.
@@ -92,13 +101,7 @@ export const fetchChatViews = createAsyncThunk(
  */
 const chatViewSlice = createSlice({
     name: 'chatView',
-    initialState: {
-        chatViewCollection: [], 
-        isLoadingChatViews: true,
-        currentlyDisplayedChatView: "1",
-        userAvatars: new Map<string, string>(),
-        error: null
-    } as ChatViewState,
+    initialState,
     reducers: {
         setIsLoadingChatViews: (state, action) => {
             state.isLoadingChatViews = action.payload;
@@ -201,6 +204,10 @@ const chatViewSlice = createSlice({
           })
           .addCase(fetchChatViews.rejected, (state, action) => {
             state.error = action.error.message || 'Failed to fetch messages';
+          })
+      // Clear chatView state on logout
+          .addCase(clearAuth, () => {
+            return initialState;
           });
     }
 });
