@@ -10,6 +10,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { handleLogout } from '../../store/slices/authSlice';
+import { getFilteredAndSortedChats } from '../../utils/chatFilterUtils';
 import NewChatButton from '../chat/NewChatButton';
 import NewChatModal from '../chat/NewChatModal';
 import SearchBar from '../ui/SearchBar';
@@ -33,28 +34,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
 
   // Filter and sort chats based on search query and by newest first
   const filteredChats = useMemo(() => {
-    let chats = chatViewCollection;
-    
-    // Filter by search query
-    if (searchQuery.trim()) {
-      chats = chats.filter(chat => 
-        chat.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Sort by newest chat first (most recent message)
-    return [...chats].sort((a, b) => {
-      const getLatestMessageTime = (messages: typeof a.messages) => {
-        if (!messages || messages.length === 0) return 0;
-        const latestMessage = messages[messages.length - 1];
-        return new Date(latestMessage.createdAt).getTime();
-      };
-      
-      const timeA = getLatestMessageTime(a.messages);
-      const timeB = getLatestMessageTime(b.messages);
-      
-      return timeB - timeA; 
-    });
+    return getFilteredAndSortedChats(chatViewCollection, searchQuery);
   }, [chatViewCollection, searchQuery]);
 
   return (

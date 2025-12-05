@@ -1,6 +1,8 @@
 import { Box, CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { markAsRead } from '../../store/slices/chatViewSlice';
 import type { ChatViewProps } from '../../types/chatViewProps';
 import { useLayout } from '../Layout';
 import ChatHeader from './ChatHeader';
@@ -21,12 +23,20 @@ import MessageContainer from './MessageContainer';
  * @returns {React.ReactElement} Chat interface with message display and input
  */
 export default function ChatView({ viewId }: ChatViewProps) {
+  const dispatch = useAppDispatch();
   const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
   const { toggleDrawer, isMobile } = useLayout();
   const chatView = useAppSelector(
     state => state.chatView.chatViewCollection.find(view => view.viewId === viewId),
     shallowEqual
   );
+
+  // Mark chat as read when it becomes the active view
+  useEffect(() => {
+    if (viewId) {
+      dispatch(markAsRead(viewId));
+    }
+  }, [viewId, dispatch]);
 
   //SENDING MESSAGE
   function handleMessageSend(message: string) {
@@ -50,7 +60,6 @@ export default function ChatView({ viewId }: ChatViewProps) {
         overflow: 'hidden'
       }}
     >
-      {/* Title Bar */}
       <ChatHeader 
         title={chatView?.title || '{chatview title}'}
         isMobile={isMobile}
@@ -70,12 +79,10 @@ export default function ChatView({ viewId }: ChatViewProps) {
         </Box>
       ) : (
         <>
-          {/* Message Container */}
           <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
             <MessageContainer messages={chatView?.messages || []} />
           </Box>
 
-          {/* Input Area */}
           <ChatInput 
             onSendMessage={handleMessageSend}
             disabled={connectionStatus !== 'connected'}

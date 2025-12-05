@@ -8,6 +8,7 @@ import {
     ListItemText,
     Typography,
 } from '@mui/material';
+import type { ChatView } from '../../types/chatView';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setCurrentlyDisplayedChatView } from '../../store/slices/chatViewSlice';
 import type { SidebarItemProps } from '../../types/sidebarItemProps';
@@ -19,10 +20,12 @@ export default function SidebarItem({ viewId, title, isLoading }: SidebarItemPro
     
     const isActive = currentlyDisplayedChatView === viewId;
     
-    const chatView = chatViewCollection.find(chat => chat.viewId === viewId);
+    const chatView = chatViewCollection.find((chat: ChatView) => chat.viewId === viewId);
     const lastMessage = chatView?.messages && chatView.messages.length > 0 
       ? chatView.messages[chatView.messages.length - 1] 
       : null;
+    const unreadCount = chatView?.unreadCount ?? 0;
+    const hasUnread = unreadCount > 0 && !isActive;
     
     const senderDisplayName = lastMessage?.senderUid === currentUser.uid ? 'You' : lastMessage?.senderName;
     
@@ -50,28 +53,40 @@ export default function SidebarItem({ viewId, title, isLoading }: SidebarItemPro
                 '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.15)'
                 },
-                py: 1.5
+                py: 1.5,
                 }}
             >
                 <FontAwesomeIcon icon={faUsers} size="lg" />
                 <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                    <ListItemText 
-                        primary={title}
-                        primaryTypographyProps={{
-                            noWrap: true,
-                            sx: { fontWeight: 600 }
-                        }}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
+                        <ListItemText 
+                            primary={title}
+                            primaryTypographyProps={{
+                                noWrap: true,
+                                sx: { fontWeight: hasUnread ? 700 : 600 }
+                            }}
+                        />
+                        {hasUnread && (
+                            <Box
+                                sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    backgroundColor: '#2196F3'
+                                }}
+                            />
+                        )}
+                    </Box>
                     {lastMessage && (
                         <Typography 
                             variant="caption" 
                             sx={{ 
-                                color: 'rgba(255, 255, 255, 0.6)',
+                                color: hasUnread ? '#fff' : 'rgba(255, 255, 255, 0.6)',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap',
                                 display: 'block',
-                                mt: 0.5
+                                fontWeight: hasUnread ? 600 : 400
                             }}
                         >
                             {senderDisplayName}: {lastMessage.text}

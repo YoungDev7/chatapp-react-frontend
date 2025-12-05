@@ -6,4 +6,5 @@ export type ChatView = {
   messages: Message[];
   isLoading: boolean;
   error: string | null;
+  unreadCount?: number;
 }

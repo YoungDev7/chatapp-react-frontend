@@ -142,6 +142,18 @@ const chatViewSlice = createSlice({
           Object.entries(userAvatarsObj).forEach(([userId, avatarUrl]) => {
             state.userAvatars.set(userId, avatarUrl as string);
           });          
+        },
+        markAsRead: (state, action) => {
+          const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+          if (chatView) {
+            chatView.unreadCount = 0;
+          }
+        },
+        incrementUnreadCount: (state, action) => {
+          const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+          if (chatView) {
+            chatView.unreadCount = (chatView.unreadCount || 0) + 1;
+          }
         }
     },
     extraReducers: (builder) => {
@@ -212,7 +224,7 @@ const chatViewSlice = createSlice({
     }
 });
 
-export const { setIsLoadingChatViews, setCurrentlyDisplayedChatView, setMessages, addMessage, addChatView, addUserAvatars } = chatViewSlice.actions;
+export const { setIsLoadingChatViews, setCurrentlyDisplayedChatView, setMessages, addMessage, addChatView, addUserAvatars, markAsRead, incrementUnreadCount } = chatViewSlice.actions;
 
 export const selectUserAvatar = (state: { chatView: ChatViewState }, userId: string): string | undefined => {
   return state.chatView.userAvatars.get(userId);
