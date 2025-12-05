@@ -19,7 +19,7 @@ export const searchUser = async (query: string): Promise<User | null> => {
   }
 
   try {
-    const response = await api.get(`/user/search?query=${encodeURIComponent(query)}`);
+    const response = await api.get(`/user/search/${encodeURIComponent(query)}`);
     return response.data;
   } catch (err: unknown) {
     // User not found is expected behavior, return null
