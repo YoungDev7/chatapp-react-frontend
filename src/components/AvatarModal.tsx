@@ -95,7 +95,6 @@ export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Pr
               alt="Avatar preview"
               onError={handleImageError}
               onLoad={handleImageLoad}
-              crossOrigin="anonymous"
               style={{
                 width: '100%',
                 height: '100%',
