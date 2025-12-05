@@ -1,13 +1,16 @@
 import { Avatar } from '@mui/material';
 import '../../style/ChatMessage.css';
-import type { ChatMessageProps } from '../../types/chatMessage';
+import type { ChatMessageProps } from '../../types/chatMessageProps';
 import { getAvatarColor, getAvatarInitial } from '../../utils/avatarUtils';
 import { isEmojiOnly } from '../../utils/emojiUtils';
 import { formatMessageTimestamp } from '../../utils/timestampUtils';
 
-export default function ChatMessage({sender, text, isUser, showSender, showAvatar, timestamp, showTimestamp}: ChatMessageProps) {
+
+export default function ChatMessage({sender, senderAvatarLink, text, isUser, showSender, showAvatar, timestamp, showTimestamp}: ChatMessageProps) {
   const isEmojiOnlyMessage = isEmojiOnly(text);
   
+  //todo: finish implementing avatar display
+
   return (
     <div className={`message ${isUser ? 'usersMessage' : 'othersMessage'} ${!showSender ? 'groupedMessage' : ''}`}>
       <div className="messageRow">

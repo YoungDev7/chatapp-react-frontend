@@ -99,8 +99,7 @@ const clearAuthState = (state: AuthState) => {
   state.token = null;
   state.user = { email: null, name: null, uid: null, avatarLink: null };
   state.isValidating = false;
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('user');
+  localStorage.clear();
 };
 
 /**
@@ -138,13 +137,8 @@ const authSlice = createSlice({
       
       if (newToken) {
         localStorage.setItem('accessToken', newToken);
-        updateUserFromToken(state, newToken);
-        if (state.user.uid) {
-          localStorage.setItem('user', JSON.stringify(state.user));
-        }
       } else {
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
       }
     },
     clearAuth: (state) => {
@@ -172,9 +166,6 @@ const authSlice = createSlice({
       .addCase(validateToken.fulfilled, (state) => {
         state.isValidating = false;
         updateUserFromToken(state, state.token);
-        if (state.user.uid) {
-          localStorage.setItem('user', JSON.stringify(state.user));
-        }
       })
       .addCase(validateToken.rejected, (state) => {
         clearAuthState(state);

@@ -6,13 +6,17 @@ import AuthHandler from './components/auth/AuthHandler';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ChatView from './components/chat/ChatView';
+import InitializationHandler from './components/InitializationHandler';
 import Layout from './components/Layout';
 import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 import WebSocketHandler from './components/WebSocketHandler';
+import { useAppSelector } from './store/hooks';
 import theme from './theme';
 
 function App() {
+  const { currentlyDisplayedChatView } =useAppSelector(state => state.chatView);
+
   return (
     <AuthHandler> {/*provides acces to token and handles token auth*/}
       <ThemeProvider theme={theme}>
@@ -29,15 +33,17 @@ function App() {
           } />
           <Route element={
             <ProtectedRoute>
-              <WebSocketHandler>
-                <Layout>
-                  <Outlet /> {/* child components, all child components are nested inside of ProtectedRoute => SocketProvider => Layout*/}
-                </Layout>
-              </WebSocketHandler>
+              <InitializationHandler>
+                <WebSocketHandler>
+                  <Layout>
+                    <Outlet /> {/* child components, all child components are nested inside of ProtectedRoute => SocketProvider => Layout*/}
+                  </Layout>
+                </WebSocketHandler>
+              </InitializationHandler>
             </ProtectedRoute>
           }>
             {/*here are child components to be rendered inside of outlet */}
-            <Route path="/" element={<ChatView />} /> 
+            <Route path="/" element={<ChatView viewId={currentlyDisplayedChatView} />} /> 
           </Route>
         </Routes>
       </ThemeProvider>

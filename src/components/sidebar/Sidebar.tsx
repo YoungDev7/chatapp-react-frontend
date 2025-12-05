@@ -1,21 +1,19 @@
-import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Button,
   List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Paper,
   Typography
 } from '@mui/material';
-import React, { useState, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { handleLogout } from '../store/slices/authSlice';
-import NewChatButton from './chat/NewChatButton';
-import NewChatModal from './chat/NewChatModal';
-import SearchBar from './ui/SearchBar';
+import React, { useMemo, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { handleLogout } from '../../store/slices/authSlice';
+import NewChatButton from '../chat/NewChatButton';
+import NewChatModal from '../chat/NewChatModal';
+import SearchBar from '../ui/SearchBar';
+import SidebarItem from './SidebarItem';
 
 
 /**
@@ -82,31 +80,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
       <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
         {filteredChats.length > 0 ? (
           filteredChats.map((chat) => (
-            <ListItem 
-              key={chat.viewId}
-              disablePadding
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: 1,
-                mb: 1
-              }}
-            >
-              <ListItemButton 
-                href="/"
-                sx={{ 
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                  }
-                }}
-              >
-                <FontAwesomeIcon icon={faUsers} size="lg" />
-                <ListItemText primary={chat.title} />
-              </ListItemButton>
-            </ListItem>
+            <SidebarItem key={chat.viewId} viewId={chat.viewId} title={chat.title} isLoading={chat.isLoading} />
           ))
         ) : (
           <Box 
