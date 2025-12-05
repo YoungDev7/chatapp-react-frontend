@@ -54,11 +54,22 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
         try {
           const showSender = index === 0 || messages[index - 1]?.senderName !== message.senderName;
           
-          const isLastInGroup = 
-            index === messages.length - 1 || 
-            messages[index + 1]?.senderName !== message.senderName; 
+          const currentMessageTime = message.createdAt ? new Date(message.createdAt) : null;
+          const nextMessage = messages[index + 1];
+          const nextMessageTime = nextMessage?.createdAt ? new Date(nextMessage.createdAt) : null;
           
-          const showAvatar = isLastInGroup;
+          let showAvatar = false;
+          
+          if (index === messages.length - 1) {
+            showAvatar = true;
+          } else if (messages[index + 1]?.senderName !== message.senderName) {
+            showAvatar = true;
+          } else if (currentMessageTime && nextMessageTime) {
+            const sameMinute = 
+              currentMessageTime.getHours() === nextMessageTime.getHours() &&
+              currentMessageTime.getMinutes() === nextMessageTime.getMinutes();
+            showAvatar = !sameMinute;
+          }
           
           let showTimestamp = false;
           if (message.createdAt) {

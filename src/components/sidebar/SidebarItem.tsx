@@ -1,10 +1,12 @@
 import { faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+    Box,
     CircularProgress,
     ListItem,
     ListItemButton,
     ListItemText,
+    Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setCurrentlyDisplayedChatView } from '../../store/slices/chatViewSlice';
@@ -12,9 +14,17 @@ import type { SidebarItemProps } from '../../types/sidebarItemProps';
 
 export default function SidebarItem({ viewId, title, isLoading }: SidebarItemProps) {
     const dispatch = useAppDispatch();
-    const { currentlyDisplayedChatView } = useAppSelector(state => state.chatView);
+    const { currentlyDisplayedChatView, chatViewCollection } = useAppSelector(state => state.chatView);
+    const { user: currentUser } = useAppSelector(state => state.auth);
     
     const isActive = currentlyDisplayedChatView === viewId;
+    
+    const chatView = chatViewCollection.find(chat => chat.viewId === viewId);
+    const lastMessage = chatView?.messages && chatView.messages.length > 0 
+      ? chatView.messages[chatView.messages.length - 1] 
+      : null;
+    
+    const senderDisplayName = lastMessage?.senderUid === currentUser.uid ? 'You' : lastMessage?.senderName;
     
     return (
         <>
@@ -39,11 +49,35 @@ export default function SidebarItem({ viewId, title, isLoading }: SidebarItemPro
                 borderRadius: 1,
                 '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.15)'
-                }
+                },
+                py: 1.5
                 }}
             >
                 <FontAwesomeIcon icon={faUsers} size="lg" />
-                <ListItemText primary={title} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                    <ListItemText 
+                        primary={title}
+                        primaryTypographyProps={{
+                            noWrap: true,
+                            sx: { fontWeight: 600 }
+                        }}
+                    />
+                    {lastMessage && (
+                        <Typography 
+                            variant="caption" 
+                            sx={{ 
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                display: 'block',
+                                mt: 0.5
+                            }}
+                        >
+                            {senderDisplayName}: {lastMessage.text}
+                        </Typography>
+                    )}
+                </Box>
                 {isLoading && (
                     <CircularProgress 
                         size={20} 

@@ -35,7 +35,12 @@
 .messageText.emojiOnly {
     background-color: transparent !important;
     font-size: clamp(32px, 4vw, 42px);
-    padding: 4px 8px;
+    padding: 0px 8px;
+    margin-bottom: 0;
+}
+
+.messageText:not(.emojiOnly) {
+    margin-bottom: 16px;
 }
 
 .usersMessage {
@@ -45,7 +50,7 @@
 
 .messageAvatar {
     margin-left: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
 }
 
 .othersMessage {

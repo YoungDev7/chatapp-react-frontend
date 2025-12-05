@@ -31,14 +31,30 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
 
-  // Filter chats based on search query
+  // Filter and sort chats based on search query and by newest first
   const filteredChats = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return chatViewCollection;
+    let chats = chatViewCollection;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      chats = chats.filter(chat => 
+        chat.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
-    return chatViewCollection.filter(chat => 
-      chat.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    
+    // Sort by newest chat first (most recent message)
+    return [...chats].sort((a, b) => {
+      const getLatestMessageTime = (messages: typeof a.messages) => {
+        if (!messages || messages.length === 0) return 0;
+        const latestMessage = messages[messages.length - 1];
+        return new Date(latestMessage.createdAt).getTime();
+      };
+      
+      const timeA = getLatestMessageTime(a.messages);
+      const timeB = getLatestMessageTime(b.messages);
+      
+      return timeB - timeA; 
+    });
   }, [chatViewCollection, searchQuery]);
 
   return (
@@ -71,7 +87,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
         onClose={() => setIsNewChatModalOpen(false)}
       />
 
-      <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
+      <List sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: '100%', pr: 1 }}>
         {filteredChats.length > 0 ? (
           filteredChats.map((chat) => (
             <SidebarItem key={chat.viewId} viewId={chat.viewId} title={chat.title} isLoading={chat.isLoading} />
