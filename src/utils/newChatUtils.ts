@@ -2,12 +2,17 @@ import api from '../services/Api';
 import { type User } from './userUtils';
 
 /**
- * Create a new chat with the given title
+ * Create a new chat with the given title and users
  * @param title - The title of the chat
+ * @param users - Array of users to add to the chat
  * @returns The ID of the newly created chat
  */
-export const createChat = async (title: string): Promise<number> => {
-  const response = await api.post('/chatviews', { title });
+export const createChat = async (title: string, users: User[] = []): Promise<number> => {
+  const userUids = users.map(user => user.uid);
+  const response = await api.post('/chatviews', { 
+    name: title, 
+    userUids: userUids 
+  });
   return response.data.id;
 };
 

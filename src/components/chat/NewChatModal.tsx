@@ -11,11 +11,11 @@ import {
   Paper
 } from '@mui/material';
 import { useState, useCallback, useEffect } from 'react';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addChatView } from '../../store/slices/chatViewSlice';
 import BaseModal from '../ui/BaseModal';
 import { searchUser, type User } from '../../utils/userUtils';
-import { createChat, addUsersToChat } from '../../utils/newChatUtils';
+import { createChat } from '../../utils/newChatUtils';
 
 interface NewChatModalProps {
   open: boolean;
@@ -37,6 +37,7 @@ interface NewChatModalProps {
  */
 export default function NewChatModal({ open, onClose }: NewChatModalProps) {
   const dispatch = useAppDispatch();
+  const { user: currentUser } = useAppSelector(state => state.auth);
   
   const [chatName, setChatName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,9 +65,10 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
         return;
       }
       
-      // Don't show already selected users in search results
+      // Don't show already selected users or current user in search results
       const isAlreadySelected = selectedUsers.some(u => u.uid === foundUser.uid);
-      setSearchResults(isAlreadySelected ? [] : [foundUser]);
+      const isCurrentUser = foundUser.uid === currentUser.uid;
+      setSearchResults((isAlreadySelected || isCurrentUser) ? [] : [foundUser]);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to search users';
       console.error('Error searching users:', err);
@@ -75,7 +77,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
     } finally {
       setIsSearching(false);
     }
-  }, [selectedUsers]);
+  }, [selectedUsers, currentUser.uid]);
 
   // Debounce search
   useEffect(() => {
@@ -87,6 +89,12 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
   }, [searchQuery, searchUsers]);
 
   const handleSelectUser = (user: User) => {
+    // Prevent adding yourself to the chat
+    if (user.uid === currentUser.uid) {
+      setError('You cannot add yourself to the chat');
+      return;
+    }
+    
     setSelectedUsers([...selectedUsers, user]);
     setSearchQuery('');
     setSearchResults([]);
@@ -112,11 +120,8 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
     setError(null);
 
     try {
-      // Create chat with title
-      const newChatId = await createChat(chatName.trim());
-
-      // Add selected users to the chat
-      await addUsersToChat(newChatId, selectedUsers);
+      // Create chat with title and users
+      const newChatId = await createChat(chatName.trim(), selectedUsers);
 
       // Update Redux state
       dispatch(addChatView({
@@ -213,7 +218,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           disabled={isCreating}
-          placeholder="Search by username or email"
+          placeholder="Search by username or email (excluding yourself)"
           sx={{
             '& .MuiOutlinedInput-root': {
               color: 'white',
@@ -288,6 +293,9 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
               <Box sx={{ p: 2 }}>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
                   No users found
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+                  Note: You cannot add yourself to a chat
                 </Typography>
               </Box>
             )}
