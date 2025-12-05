@@ -32,6 +32,15 @@ export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Pr
     }
   }, [open, currentAvatar]);
 
+  const isValidUrl = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSave = () => {
     if (avatarUrl.trim()) {
       onSave(avatarUrl.trim());
@@ -86,6 +95,7 @@ export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Pr
               alt="Avatar preview"
               onError={handleImageError}
               onLoad={handleImageLoad}
+              crossOrigin="anonymous"
               style={{
                 width: '100%',
                 height: '100%',
@@ -115,8 +125,8 @@ export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Pr
           }}
           autoFocus
           placeholder="https://example.com/avatar.jpg"
-          error={previewError}
-          helperText={previewError ? 'Invalid image URL' : ''}
+          error={previewError && isValidUrl(avatarUrl)}
+          helperText={previewError && isValidUrl(avatarUrl) ? 'Could not load image preview (CORS issue). URL format is valid.' : ''}
           sx={{
             '& .MuiOutlinedInput-root': {
               color: 'white',
@@ -163,7 +173,7 @@ export default function AvatarModal({ open, onClose, onSave, currentAvatar }: Pr
             variant="contained"
             onClick={handleSave}
             fullWidth
-            disabled={!avatarUrl.trim() || previewError}
+            disabled={!avatarUrl.trim() || !isValidUrl(avatarUrl)}
             sx={{
               '&:disabled': {
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',

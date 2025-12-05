@@ -43,6 +43,11 @@
     align-items: flex-end;
 }
 
+.messageAvatar {
+    margin-left: 12px;
+    margin-bottom: 18px;
+}
+
 .othersMessage {
     align-self: flex-start;
     align-items: flex-start;

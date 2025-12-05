@@ -9,19 +9,19 @@ import { formatMessageTimestamp } from '../../utils/timestampUtils';
 export default function ChatMessage({sender, senderAvatarLink, text, isUser, showSender, showAvatar, timestamp, showTimestamp}: ChatMessageProps) {
   const isEmojiOnlyMessage = isEmojiOnly(text);
   
-  //todo: finish implementing avatar display
-
   return (
     <div className={`message ${isUser ? 'usersMessage' : 'othersMessage'} ${!showSender ? 'groupedMessage' : ''}`}>
       <div className="messageRow">
         {!isUser && (
           <Avatar 
+            className="messageAvatar"
+            src={senderAvatarLink || undefined}
+            alt={sender}
             sx={{ 
-              width: 32, 
-              height: 32, 
-              fontSize: '14px',
+              width: 40, 
+              height: 40, 
+              fontSize: '12px',
               backgroundColor: getAvatarColor(sender),
-              marginRight: '8px',
               alignSelf: 'flex-end',
               visibility: showAvatar ? 'visible' : 'hidden'
             }}

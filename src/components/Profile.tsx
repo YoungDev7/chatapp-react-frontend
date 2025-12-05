@@ -35,9 +35,9 @@ export default function Profile(): React.ReactElement {
   const fetchAvatar = useCallback(async () => {
     try {
       const response = await api.get('/user/avatar');
-      if (response.data) {
-        setAvatarUrl(response.data);
-        dispatch(setAvatar(response.data));
+      if (response.data && response.data.avatarLink) {
+        setAvatarUrl(response.data.avatarLink);
+        dispatch(setAvatar(response.data.avatarLink));
       }
     } catch (error) {
       console.error('Error fetching avatar:', error);
@@ -55,8 +55,7 @@ export default function Profile(): React.ReactElement {
 
   const handleAvatarSave = async (newAvatarUrl: string) => {
     try {
-      // Spring Boot @RequestBody String expects a JSON string (with quotes)
-      await api.patch('/user/avatar', JSON.stringify(newAvatarUrl), {
+      await api.patch('/user/avatar', { avatarLink: newAvatarUrl }, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -64,8 +63,8 @@ export default function Profile(): React.ReactElement {
       setAvatarUrl(newAvatarUrl);
       dispatch(setAvatar(newAvatarUrl));
     } catch (error) {
-      console.error('Error saving avatar:', error);
-      alert('Failed to save avatar. Please try again.');
+        console.error('Error saving avatar:', error);
+        alert('Failed to save avatar. Please try again.');
     }
   };
 
