@@ -41,11 +41,6 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
     );
   }, [chatViewCollection, searchQuery]);
 
-  const handleCreateChat = (chatName: string) => {
-    // TODO: Implement create chat logic
-    console.log('Creating chat:', chatName);
-  };
-
   return (
     <Paper
       elevation={isMobile ? 0 : 2} 
@@ -74,7 +69,6 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
       <NewChatModal
         open={isNewChatModalOpen}
         onClose={() => setIsNewChatModalOpen(false)}
-        onCreateChat={handleCreateChat}
       />
 
       <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
