@@ -15,7 +15,7 @@ import { useAppSelector } from './store/hooks';
 import theme from './theme';
 
 function App() {
-  const { currentlyDisplayedChatView } =useAppSelector(state => state.chatView);
+  const { currentlyDisplayedChatView } = useAppSelector(state => state.chatView);
 
   return (
     <AuthHandler> {/*provides acces to token and handles token auth*/}
@@ -24,7 +24,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} /> {/* login page where user gets redirected if not authorized */}
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={
+          <Route path="/profile" element={ //TODO: FIX THIS
             <ProtectedRoute>
               <WebSocketHandler>
                 <Profile />
@@ -43,7 +43,7 @@ function App() {
             </ProtectedRoute>
           }>
             {/*here are child components to be rendered inside of outlet */}
-            <Route path="/" element={<ChatView viewId={currentlyDisplayedChatView} />} /> 
+            <Route path="/" element={<ChatView viewId={currentlyDisplayedChatView} />} />
           </Route>
         </Routes>
       </ThemeProvider>

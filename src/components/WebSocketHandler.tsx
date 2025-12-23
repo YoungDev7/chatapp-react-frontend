@@ -4,6 +4,9 @@ import SockJS from 'sockjs-client';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addMessage } from '../store/slices/chatViewSlice';
 import { addSubscription, clearAllSubscriptions, setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
+import { handleNotification, type NotificationDTO } from '../utils/notificationUtils';
+import { getChatViewWSDestination } from '../utils/wsUtils';
+
 
 /**
  * WebSocketHandler component that manages WebSocket connection lifecycle.
@@ -27,7 +30,7 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
     const { isLoadingChatViews, chatViewCollection } = useAppSelector(state => state.chatView);
     const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
     const env = import.meta.env;
-    
+
     // Track subscribed views to prevent race conditions
     const subscribedViewsRef = useRef<Set<string>>(new Set());
     // Track failed subscriptions to prevent infinite retry loops
@@ -35,28 +38,28 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
     const MAX_RETRY_ATTEMPTS = 3;
 
     useEffect(() => {
-        if(!token) {
+        if (!token) {
             console.log("cannot connect to websocket, token is null or undefined");
             dispatch(setConnectionStatus('disconnected'));
             dispatch(setStompClient(null));
             return;
         }
 
-        if(isLoadingChatViews){
+        if (isLoadingChatViews) {
             console.log("chatveiws are loading, cannot connect to websocket yet");
             dispatch(setConnectionStatus('disconnected'));
             dispatch(setStompClient(null));
             return;
         }
-        
+
         dispatch(setConnectionStatus('connecting'));
         dispatch(setStompClient(null));
-        
+
         // STOMP client
         const client = new Client({
-                webSocketFactory: () => new SockJS(`${env.VITE_WS_BASE_URL}?token=Bearer ${encodeURIComponent(token)}`),
+            webSocketFactory: () => new SockJS(`${env.VITE_WS_BASE_URL}?token=Bearer ${encodeURIComponent(token)}`),
             connectHeaders: {
-                Authorization: `Bearer ${token}`, 
+                Authorization: `Bearer ${token}`,
             },
             debug: (str) => {
                 console.log(str);
@@ -83,7 +86,7 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
             dispatch(setConnectionStatus('connected'));
             dispatch(setStompClient(client));
         };
-        
+
         client.onDisconnect = () => {
             console.log('Disconnected from websocket');
             dispatch(setConnectionStatus('disconnected'));
@@ -118,51 +121,78 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
 
     // Subscribe to all chat views when connected and subscribe to new ones when added
     useEffect(() => {
-        if (stompClient && connectionStatus === 'connected' && chatViewCollection.length > 0 && user.uid) {
-            console.log('Checking chat view subscriptions...');
-            
+        if (stompClient && connectionStatus === 'connected' && user.uid) {
+
+            // SUBSCRIBE TO NOTIFICATIONS
+            if (subscribedViewsRef.current.has("notifications")) {
+                return;
+            }
+
+            const failCount = failedSubscriptionsRef.current.get("notifications") || 0;
+            if (failCount >= MAX_RETRY_ATTEMPTS) {
+                console.warn(`Skipping subscription to notifications - max retry attempts reached`);
+                return;
+            }
+
+            try {
+                const subscription = stompClient.subscribe('/user/queue/notifications', (message) => {
+                    const notification = JSON.parse(message.body) as NotificationDTO;
+                    console.log('Received notification:', notification);
+                    handleNotification(notification, dispatch);
+                });
+
+                subscribedViewsRef.current.add("notifications");
+                failedSubscriptionsRef.current.delete("notifications");
+                dispatch(addSubscription({ viewId: "notifications", subscription }));
+                console.log(`Subscribed to /user/notifications`);
+            } catch (error) {
+                console.error(`Failed to subscribe to /user/notifications:`, error);
+                failedSubscriptionsRef.current.set("notifications", failCount + 1);
+            }
+
+            if (chatViewCollection.length == 0) {
+                console.log("no chatviews to subscribe to");
+                return;
+            }
+
+            // SUBSCRIBE TO CHATVIEWS
             chatViewCollection.forEach(chatView => {
-                // Skip if already subscribed
                 if (subscribedViewsRef.current.has(chatView.viewId)) {
                     return;
                 }
-                
-                // Skip if failed too many times
+
                 const failCount = failedSubscriptionsRef.current.get(chatView.viewId) || 0;
                 if (failCount >= MAX_RETRY_ATTEMPTS) {
                     console.warn(`Skipping subscription to ${chatView.viewId} - max retry attempts reached`);
                     return;
                 }
-                
-                const destination = `/topic/chatview.${chatView.viewId}.user.${user.uid}`;
-                
+
+                const destination = getChatViewWSDestination(chatView.viewId, user.uid!);
+
                 try {
                     const subscription = stompClient.subscribe(destination, (message: { body: string }) => {
                         const newMessage = JSON.parse(message.body);
                         console.log(`Received message in chatview ${chatView.viewId}:`, newMessage);
                         dispatch(addMessage({ viewId: chatView.viewId, message: newMessage }));
                     });
-                    
-                    // Mark as subscribed immediately to prevent duplicate subscriptions
+
                     subscribedViewsRef.current.add(chatView.viewId);
-                    // Clear any previous failure count on success
                     failedSubscriptionsRef.current.delete(chatView.viewId);
                     dispatch(addSubscription({ viewId: chatView.viewId, subscription }));
                     console.log(`Subscribed to ${destination}`);
                 } catch (error) {
                     console.error(`Failed to subscribe to ${destination}:`, error);
-                    // Increment failure count
                     failedSubscriptionsRef.current.set(chatView.viewId, failCount + 1);
                 }
             });
         }
-        
-        // Clear tracking when disconnected to allow fresh retry on reconnect
+
         if (connectionStatus !== 'connected') {
             subscribedViewsRef.current.clear();
             failedSubscriptionsRef.current.clear();
         }
     }, [stompClient, connectionStatus, chatViewCollection, user.uid, dispatch]);
+
 
     return children;
 }

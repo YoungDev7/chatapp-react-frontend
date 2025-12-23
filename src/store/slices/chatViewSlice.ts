@@ -13,7 +13,7 @@ type ChatViewState = {
 }
 
 const initialState: ChatViewState = {
-  chatViewCollection: [], 
+  chatViewCollection: [],
   isLoadingChatViews: true,
   currentlyDisplayedChatView: "1",
   userAvatars: new Map<string, string>(),
@@ -33,20 +33,20 @@ const initialState: ChatViewState = {
  * @throws {Object} Returns rejected value with error data or message
  */
 export const fetchAllMessages = createAsyncThunk(
-    'chatView/fetchAllMessages',
+  'chatView/fetchAllMessages',
   async (chatViewId: string, { rejectWithValue }) => {
     try {
       const response = await api.get(`/chatviews/${chatViewId}/messages`);
-      
-      return { 
-        chatViewId: chatViewId, 
-        messages: response.data 
+
+      return {
+        chatViewId: chatViewId,
+        messages: response.data
       };
     } catch (error: unknown) {
       console.error('Error fetching messages:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const responseData = (error && typeof error === 'object' && 'response' in error) 
-        ? (error as { response?: { data?: unknown } }).response?.data 
+      const responseData = (error && typeof error === 'object' && 'response' in error)
+        ? (error as { response?: { data?: unknown } }).response?.data
         : undefined;
       return rejectWithValue(responseData || errorMessage);
     }
@@ -56,18 +56,18 @@ export const fetchAllMessages = createAsyncThunk(
 export const fetchMessagesFromQueue = createAsyncThunk(
   'chatView/fetchMessagesFromQueue',
   async (chatViewId: string, { rejectWithValue }) => {
-    try{
+    try {
       const response = await api.get(`/chatviews/${chatViewId}/messages/queue`);
 
       return {
         chatViewId: chatViewId,
         messages: response.data
       }
-    }catch(error: unknown) {
+    } catch (error: unknown) {
       console.error('Error fetching messages:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const responseData = (error && typeof error === 'object' && 'response' in error) 
-        ? (error as { response?: { data?: unknown } }).response?.data 
+      const responseData = (error && typeof error === 'object' && 'response' in error)
+        ? (error as { response?: { data?: unknown } }).response?.data
         : undefined;
       return rejectWithValue(responseData || errorMessage);
     }
@@ -80,11 +80,28 @@ export const fetchChatViews = createAsyncThunk(
     try {
       const response = await api.get('/chatviews');
       return response.data;
-    }catch(error: unknown) {
+    } catch (error: unknown) {
       console.error('Error fetching messages:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      const responseData = (error && typeof error === 'object' && 'response' in error) 
-        ? (error as { response?: { data?: unknown } }).response?.data 
+      const responseData = (error && typeof error === 'object' && 'response' in error)
+        ? (error as { response?: { data?: unknown } }).response?.data
+        : undefined;
+      return rejectWithValue(responseData || errorMessage);
+    }
+  }
+)
+
+export const fetchChatViewDetails = createAsyncThunk(
+  'chatView/fetchChatViewDetails',
+  async (chatViewId: string, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/chatviews/${chatViewId}`);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error fetching messages:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const responseData = (error && typeof error === 'object' && 'response' in error)
+        ? (error as { response?: { data?: unknown } }).response?.data
         : undefined;
       return rejectWithValue(responseData || errorMessage);
     }
@@ -100,128 +117,128 @@ export const fetchChatViews = createAsyncThunk(
  * @namespace chatViewSlice
  */
 const chatViewSlice = createSlice({
-    name: 'chatView',
-    initialState,
-    reducers: {
-        setIsLoadingChatViews: (state, action) => {
-            state.isLoadingChatViews = action.payload;
-        },
-        setCurrentlyDisplayedChatView: (state, action) => {
-          state.currentlyDisplayedChatView = action.payload;
-        },
-        setMessages: (state, action) => {
-          const { viewId, messages } = action.payload;
-          const view = state.chatViewCollection.find(view => view.viewId === viewId);
-          if(view){
-            view.messages = messages;
-            localStorage.setItem(`messages_${viewId}`, JSON.stringify(messages));
-          }
-        },
-        addMessage: (state, action) => {
-          const { viewId, message } = action.payload;
-          const view = state.chatViewCollection.find(view => view.viewId === viewId);
-            if(view){
-              if (!view.messages) {
-                view.messages = [];
-              }
-              view.messages.push(message);
-              localStorage.setItem(`messages_${viewId}`, JSON.stringify(view.messages));
-            }
-        },
-        addChatView: (state, action) => {
-          state.chatViewCollection.push({ 
-            viewId: action.payload.viewId, 
-            title: action.payload.title,
-            isLoading: false,
-            messages: action.payload.messages,
-            error: null
-          });
-        },
-        addUserAvatars: (state, action) => {
-          const userAvatarsObj = action.payload;
-          Object.entries(userAvatarsObj).forEach(([userId, avatarUrl]) => {
-            state.userAvatars.set(userId, avatarUrl as string);
-          });          
-        },
-        markAsRead: (state, action) => {
-          const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
-          if (chatView) {
-            chatView.unreadCount = 0;
-          }
-        },
-        incrementUnreadCount: (state, action) => {
-          const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
-          if (chatView) {
-            chatView.unreadCount = (chatView.unreadCount || 0) + 1;
-          }
-        }
+  name: 'chatView',
+  initialState,
+  reducers: {
+    setIsLoadingChatViews: (state, action) => {
+      state.isLoadingChatViews = action.payload;
     },
-    extraReducers: (builder) => {
-      builder 
-      // fetchAllMessages
-         .addCase(fetchAllMessages.pending, (state, action) => {
-            const chatViewId = action.meta.arg;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = true;
-            }
-          })
-          .addCase(fetchAllMessages.fulfilled, (state, action) => {
-            const { chatViewId, messages } = action.payload;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = false;
-              view.messages = messages;
-              localStorage.setItem(`messages_${chatViewId}`, JSON.stringify(messages));
-            }
-          })
-          .addCase(fetchAllMessages.rejected, (state, action) => {
-            const chatViewId = action.meta.arg;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = false;
-              view.error = action.error.message || 'Failed to fetch messages';
-            }
-          })
-      // fetchMessagesFromQueue
-          .addCase(fetchMessagesFromQueue.pending, (state, action) => {
-            const chatViewId = action.meta.arg;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = true;
-            }
-          })
-          .addCase(fetchMessagesFromQueue.fulfilled, (state, action) => {
-            const { chatViewId, messages } = action.payload;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = false;
-              const localStorageMessages = JSON.parse(localStorage.getItem(`messages_${chatViewId}`) || '[]');
-              const updatedMessages = [...localStorageMessages, ...messages];
-              view.messages = updatedMessages;
-              localStorage.setItem(`messages_${chatViewId}`, JSON.stringify(updatedMessages));
-            }
-          })
-          .addCase(fetchMessagesFromQueue.rejected, (state, action) => {
-            const chatViewId = action.meta.arg;
-            const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
-            if (view) {
-              view.isLoading = false;
-              view.error = action.error.message || 'Failed to fetch messages';
-            }
-          })
-      // fetchChatViews
-          .addCase(fetchChatViews.fulfilled, (state) => {
-            state.error = null
-          })
-          .addCase(fetchChatViews.rejected, (state, action) => {
-            state.error = action.error.message || 'Failed to fetch messages';
-          })
-      // Clear chatView state on logout
-          .addCase(clearAuth, () => {
-            return initialState;
-          });
+    setCurrentlyDisplayedChatView: (state, action) => {
+      state.currentlyDisplayedChatView = action.payload;
+    },
+    setMessages: (state, action) => {
+      const { viewId, messages } = action.payload;
+      const view = state.chatViewCollection.find(view => view.viewId === viewId);
+      if (view) {
+        view.messages = messages;
+        localStorage.setItem(`messages_${viewId}`, JSON.stringify(messages));
+      }
+    },
+    addMessage: (state, action) => {
+      const { viewId, message } = action.payload;
+      const view = state.chatViewCollection.find(view => view.viewId === viewId);
+      if (view) {
+        if (!view.messages) {
+          view.messages = [];
+        }
+        view.messages.push(message);
+        localStorage.setItem(`messages_${viewId}`, JSON.stringify(view.messages));
+      }
+    },
+    addChatView: (state, action) => {
+      state.chatViewCollection.push({
+        viewId: action.payload.viewId,
+        title: action.payload.title,
+        isLoading: false,
+        messages: action.payload.messages,
+        error: null
+      });
+    },
+    addUserAvatars: (state, action) => {
+      const userAvatarsObj = action.payload;
+      Object.entries(userAvatarsObj).forEach(([userId, avatarUrl]) => {
+        state.userAvatars.set(userId, avatarUrl as string);
+      });
+    },
+    markAsRead: (state, action) => {
+      const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+      if (chatView) {
+        chatView.unreadCount = 0;
+      }
+    },
+    incrementUnreadCount: (state, action) => {
+      const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+      if (chatView) {
+        chatView.unreadCount = (chatView.unreadCount || 0) + 1;
+      }
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      // fetchAllMessages
+      .addCase(fetchAllMessages.pending, (state, action) => {
+        const chatViewId = action.meta.arg;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = true;
+        }
+      })
+      .addCase(fetchAllMessages.fulfilled, (state, action) => {
+        const { chatViewId, messages } = action.payload;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = false;
+          view.messages = messages;
+          localStorage.setItem(`messages_${chatViewId}`, JSON.stringify(messages));
+        }
+      })
+      .addCase(fetchAllMessages.rejected, (state, action) => {
+        const chatViewId = action.meta.arg;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = false;
+          view.error = action.error.message || 'Failed to fetch messages';
+        }
+      })
+      // fetchMessagesFromQueue
+      .addCase(fetchMessagesFromQueue.pending, (state, action) => {
+        const chatViewId = action.meta.arg;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = true;
+        }
+      })
+      .addCase(fetchMessagesFromQueue.fulfilled, (state, action) => {
+        const { chatViewId, messages } = action.payload;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = false;
+          const localStorageMessages = JSON.parse(localStorage.getItem(`messages_${chatViewId}`) || '[]');
+          const updatedMessages = [...localStorageMessages, ...messages];
+          view.messages = updatedMessages;
+          localStorage.setItem(`messages_${chatViewId}`, JSON.stringify(updatedMessages));
+        }
+      })
+      .addCase(fetchMessagesFromQueue.rejected, (state, action) => {
+        const chatViewId = action.meta.arg;
+        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        if (view) {
+          view.isLoading = false;
+          view.error = action.error.message || 'Failed to fetch messages';
+        }
+      })
+      // fetchChatViews
+      .addCase(fetchChatViews.fulfilled, (state) => {
+        state.error = null
+      })
+      .addCase(fetchChatViews.rejected, (state, action) => {
+        state.error = action.error.message || 'Failed to fetch chatviews';
+      })
+      // Clear chatView state on logout
+      .addCase(clearAuth, () => {
+        return initialState;
+      });
+  }
 });
 
 export const { setIsLoadingChatViews, setCurrentlyDisplayedChatView, setMessages, addMessage, addChatView, addUserAvatars, markAsRead, incrementUnreadCount } = chatViewSlice.actions;
