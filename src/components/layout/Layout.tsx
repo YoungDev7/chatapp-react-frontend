@@ -1,5 +1,6 @@
 import { Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
 import React, { createContext, useContext, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
 type Props = {
@@ -25,11 +26,25 @@ export default function Layout({ children }: Props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const location = useLocation();
+  const isFullScreenRoute = location.pathname === '/profile';
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
   };
 
+  // Full screen layout for specific routes
+  if (isFullScreenRoute) {
+    return (
+      <Box sx={{ height: '100vh', overflow: 'hidden' }}>
+        <LayoutContext.Provider value={{ toggleDrawer, isMobile }}>
+          {children}
+        </LayoutContext.Provider>
+      </Box>
+    );
+  }
+
+  // Normal layout with sidebar
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', p: { xs: 0, md: 2 }, gap: { xs: 0, md: 2 }, boxSizing: 'border-box' }}>
       {/* Desktop Sidebar */}
