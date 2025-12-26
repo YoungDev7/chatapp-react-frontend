@@ -69,7 +69,7 @@ useEffect(() => {
     }) => {
       // Store chat view with messages
       dispatch(addChatView({
-        viewId: chatView.id,
+        id: chatView.id,
         title: chatView.name,
         messages: parsedStoredmessages,
       }));
@@ -326,29 +326,29 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
     if (stompClient && connectionStatus === 'connected') {
       chatViewCollection.forEach(chatView => {
         // 👇 Prevent duplicate subscriptions
-        if (subscribedViewsRef.current.has(chatView.viewId)) return;
+        if (subscribedViewsRef.current.has(chatView.id)) return;
         
         // 👇 Prevent infinite retry loops
-        const failCount = failedSubscriptionsRef.current.get(chatView.viewId) || 0;
+        const failCount = failedSubscriptionsRef.current.get(chatView.id) || 0;
         if (failCount >= MAX_RETRY_ATTEMPTS) {
-          console.warn(`Skipping ${chatView.viewId} - max retries reached`);
+          console.warn(`Skipping ${chatView.id} - max retries reached`);
           return;
         }
         
-        const destination = `/topic/chatview.${chatView.viewId}.user.${user.uid}`;
+        const destination = `/topic/chatview.${chatView.id}.user.${user.uid}`;
         
         try {
           const subscription = stompClient.subscribe(destination, (message) => {
             const newMessage = JSON.parse(message.body);
-            dispatch(addMessage({ viewId: chatView.viewId, message: newMessage }));
+            dispatch(addMessage({ id: chatView.id, message: newMessage }));
           });
           
           // 👇 Mark as subscribed immediately
-          subscribedViewsRef.current.add(chatView.viewId);
-          failedSubscriptionsRef.current.delete(chatView.viewId);
-          dispatch(addSubscription({ viewId: chatView.viewId, subscription }));
+          subscribedViewsRef.current.add(chatView.id);
+          failedSubscriptionsRef.current.delete(chatView.id);
+          dispatch(addSubscription({ id: chatView.id, subscription }));
         } catch (error) {
-          failedSubscriptionsRef.current.set(chatView.viewId, failCount + 1);
+          failedSubscriptionsRef.current.set(chatView.id, failCount + 1);
         }
       });
     }
@@ -381,19 +381,19 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
 // useEffect(() => {
 //   const subscription = stompClient.subscribe(...);
 //   return () => subscription.unsubscribe();
-// }, [viewId]);
+// }, [id]);
 
 // ✅ NOW: Just sends messages
-export default function ChatView({ viewId }: ChatViewProps) {
+export default function ChatView({ id }: ChatViewProps) {
   const { stompClient } = useAppSelector(state => state.ws);
   const chatView = useAppSelector(
-    state => state.chatView.chatViewCollection.find(view => view.viewId === viewId)
+    state => state.chatView.chatViewCollection.find(view => view.id === id)
   );
 
   function handleMessageSend(message: string) {
     if (stompClient) {
       stompClient.publish({
-        destination: `/app/chatview/${viewId}`,
+        destination: `/app/chatview/${id}`,
         body: JSON.stringify({ text: message, createdAt: new Date().toISOString() })
       });
     }
@@ -440,8 +440,8 @@ export const wsSlice = createSlice({
   },
   reducers: {
     addSubscription: (state, action) => {
-      const { viewId, subscription } = action.payload;
-      state.subscriptions.set(viewId, subscription);
+      const { id, subscription } = action.payload;
+      state.subscriptions.set(id, subscription);
     },
     clearAllSubscriptions: (state) => {
       state.subscriptions.forEach(sub => sub.unsubscribe());
@@ -467,26 +467,26 @@ type ChatViewState = {
 // ✅ NEW: Support multiple chat views
 reducers: {
   setMessages: (state, action) => {
-    const { viewId, messages } = action.payload;
-    const view = state.chatViewCollection.find(v => v.viewId === viewId);
+    const { id, messages } = action.payload;
+    const view = state.chatViewCollection.find(v => v.id === id);
     if (view) {
       view.messages = messages;
-      localStorage.setItem(`messages_${viewId}`, JSON.stringify(messages));
+      localStorage.setItem(`messages_${id}`, JSON.stringify(messages));
     }
   },
   
   addMessage: (state, action) => {
-    const { viewId, message } = action.payload;
-    const view = state.chatViewCollection.find(v => v.viewId === viewId);
+    const { id, message } = action.payload;
+    const view = state.chatViewCollection.find(v => v.id === id);
     if (view) {
       view.messages.push(message);
-      localStorage.setItem(`messages_${viewId}`, JSON.stringify(view.messages));
+      localStorage.setItem(`messages_${id}`, JSON.stringify(view.messages));
     }
   },
   
   addChatView: (state, action) => {
     state.chatViewCollection.push({
-      viewId: action.payload.viewId,
+      id: action.payload.id,
       title: action.payload.title,
       messages: action.payload.messages,
       isLoading: false,
@@ -555,7 +555,7 @@ export default function InitializationHandler({ children }: { children: ReactNod
 
         // 3. Add chat view to Redux
         dispatch(addChatView({
-          viewId: chatView.id,
+          id: chatView.id,
           title: chatView.name,
           messages: parsedStoredmessages,
         }));
@@ -590,14 +590,14 @@ export default function InitializationHandler({ children }: { children: ReactNod
 
 ```tsx
 // sidebar/SidebarItem.tsx
-export default function SidebarItem({ viewId, title, isLoading }: SidebarItemProps) {
+export default function SidebarItem({ id, title, isLoading }: SidebarItemProps) {
   const dispatch = useAppDispatch();
   const { currentlyDisplayedChatView } = useAppSelector(state => state.chatView);
-  const isActive = currentlyDisplayedChatView === viewId;
+  const isActive = currentlyDisplayedChatView === id;
   
   return (
     <ListItemButton 
-      onClick={() => dispatch(setCurrentlyDisplayedChatView(viewId))}
+      onClick={() => dispatch(setCurrentlyDisplayedChatView(id))}
       sx={{ 
         backgroundColor: isActive ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
         border: isActive ? 1 : 0,
@@ -628,8 +628,8 @@ const { chatViewCollection } = useAppSelector(state => state.chatView);
 <List>
   {chatViewCollection.map((chat) => (
     <SidebarItem 
-      key={chat.viewId} 
-      viewId={chat.viewId} 
+      key={chat.id} 
+      id={chat.id} 
       title={chat.title} 
       isLoading={chat.isLoading} 
     />
@@ -645,10 +645,10 @@ export default function ChatView() {
   // ...
 }
 
-// ✅ NEW: Receives viewId to display specific chat
-export default function ChatView({ viewId }: ChatViewProps) {
+// ✅ NEW: Receives id to display specific chat
+export default function ChatView({ id }: ChatViewProps) {
   const chatView = useAppSelector(
-    state => state.chatView.chatViewCollection.find(v => v.viewId === viewId),
+    state => state.chatView.chatViewCollection.find(v => v.id === id),
     shallowEqual  // 👈 Performance optimization
   );
   
@@ -680,7 +680,7 @@ export type Message = {
 
 // types/chatView.ts
 export type ChatView = {
-  viewId: string;
+  id: string;
   title: string;
   messages: Message[];
   isLoading: boolean;
@@ -689,7 +689,7 @@ export type ChatView = {
 
 // types/chatViewProps.ts
 export type ChatViewProps = {
-  viewId: string;          // 👈 NEW: ChatView now receives viewId
+  id: string;          // 👈 NEW: ChatView now receives id
 };
 
 // types/chatMessageProps.ts
@@ -712,7 +712,7 @@ export type MessageContainerProps = {
 
 // types/sidebarItemProps.ts
 export type SidebarItemProps = {
-  viewId: string;
+  id: string;
   title: string;
   isLoading: boolean;
 };
@@ -810,7 +810,7 @@ src/
     Layout.tsx                          # Updated import path
     WebSocketHandler.tsx                # Centralized subscriptions
     chat/
-      ChatView.tsx                      # Now receives viewId prop
+      ChatView.tsx                      # Now receives id prop
       ChatMessage.tsx                   # Added avatar props (not used yet)
       MessageContainer.tsx              # Retrieves avatars from Redux
   store/
@@ -855,7 +855,7 @@ Response: [
 GET /chatviews/:id/messages/queue
 Response: [ /* Same as above */ ]
 
-WS /topic/chatview.{viewId}.user.{userId}
+WS /topic/chatview.{id}.user.{userId}
 Message: {
   "text": "New message",
   "senderName": "Jane",

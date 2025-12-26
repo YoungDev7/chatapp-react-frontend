@@ -70,7 +70,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
       <List sx={{ flexGrow: 1, overflowY: 'auto', maxHeight: '100%', pr: 1 }}>
         {filteredChats.length > 0 ? (
           filteredChats.map((chat) => (
-            <SidebarItem key={chat.viewId} viewId={chat.viewId} title={chat.title} isLoading={chat.isLoading} />
+            <SidebarItem key={chat.id} chatviewId={chat.id} title={chat.title} isLoading={chat.isLoading} />
           ))
         ) : (
           <Box

@@ -24,26 +24,26 @@ export const wsSlice = createSlice({
   initialState,
   reducers: {
     setStompClient: (state, action) => {
-        state.stompClient = action.payload;
+      state.stompClient = action.payload;
     },
     setConnectionStatus: (state, action) => {
-        state.connectionStatus = action.payload;
+      state.connectionStatus = action.payload;
     },
     addSubscription: (state, action) => {
-        const { viewId, subscription } = action.payload;
-        state.subscriptions.set(viewId, subscription);
+      const { id, subscription } = action.payload;
+      state.subscriptions.set(id, subscription);
     },
     removeSubscription: (state, action) => {
-        const viewId = action.payload;
-        state.subscriptions.delete(viewId);
+      const id = action.payload;
+      state.subscriptions.delete(id);
     },
     clearAllSubscriptions: (state) => {
-        state.subscriptions.forEach(sub => {
-          if (sub && typeof sub.unsubscribe === 'function') {
-            sub.unsubscribe();
-          }
-        });
-        state.subscriptions.clear();
+      state.subscriptions.forEach(sub => {
+        if (sub && typeof sub.unsubscribe === 'function') {
+          sub.unsubscribe();
+        }
+      });
+      state.subscriptions.clear();
     },
   },
   extraReducers: (builder) => {

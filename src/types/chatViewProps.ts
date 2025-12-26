@@ -1,3 +1,3 @@
 export type ChatViewProps = {
-  viewId: string;
+  id: string;
 }

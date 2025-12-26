@@ -13,14 +13,14 @@ import { setCurrentlyDisplayedChatView } from '../../store/slices/chatViewSlice'
 import type { ChatView } from '../../types/chatView';
 import type { SidebarItemProps } from '../../types/sidebarItemProps';
 
-export default function SidebarItem({ viewId, title, isLoading }: SidebarItemProps) {
+export default function SidebarItem({ chatviewId, title, isLoading }: SidebarItemProps) {
     const dispatch = useAppDispatch();
     const { currentlyDisplayedChatView, chatViewCollection } = useAppSelector(state => state.chatView);
     const { user: currentUser } = useAppSelector(state => state.auth);
 
-    const isActive = currentlyDisplayedChatView === viewId;
+    const isActive = currentlyDisplayedChatView === chatviewId;
 
-    const chatView = chatViewCollection.find((chat: ChatView) => chat.viewId === viewId);
+    const chatView = chatViewCollection.find((chat: ChatView) => chat.id === chatviewId);
     const lastMessage = chatView?.messages && chatView.messages.length > 0
         ? chatView.messages[chatView.messages.length - 1]
         : null;
@@ -40,7 +40,7 @@ export default function SidebarItem({ viewId, title, isLoading }: SidebarItemPro
                 }}
             >
                 <ListItemButton
-                    onClick={() => dispatch(setCurrentlyDisplayedChatView(viewId))}
+                    onClick={() => dispatch(setCurrentlyDisplayedChatView(chatviewId))}
                     sx={{
                         color: isLoading ? 'rgba(255, 255, 255, 0.5)' : 'white',
                         display: 'flex',

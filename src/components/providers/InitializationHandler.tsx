@@ -31,7 +31,7 @@ export function initializeSingleChatView(
     console.log("msgs ", parsedStoredmessages);
 
     dispatch(addChatView({
-        viewId: chatView.id,
+        id: chatView.id,
         title: chatView.name,
         messages: parsedStoredmessages,
     }));

@@ -127,27 +127,27 @@ const chatViewSlice = createSlice({
       state.currentlyDisplayedChatView = action.payload;
     },
     setMessages: (state, action) => {
-      const { viewId, messages } = action.payload;
-      const view = state.chatViewCollection.find(view => view.viewId === viewId);
+      const { id, messages } = action.payload;
+      const view = state.chatViewCollection.find(view => view.id === id);
       if (view) {
         view.messages = messages;
-        localStorage.setItem(`messages_${viewId}`, JSON.stringify(messages));
+        localStorage.setItem(`messages_${id}`, JSON.stringify(messages));
       }
     },
     addMessage: (state, action) => {
-      const { viewId, message } = action.payload;
-      const view = state.chatViewCollection.find(view => view.viewId === viewId);
+      const { id, message } = action.payload;
+      const view = state.chatViewCollection.find(view => view.id === id);
       if (view) {
         if (!view.messages) {
           view.messages = [];
         }
         view.messages.push(message);
-        localStorage.setItem(`messages_${viewId}`, JSON.stringify(view.messages));
+        localStorage.setItem(`messages_${id}`, JSON.stringify(view.messages));
       }
     },
     addChatView: (state, action) => {
       state.chatViewCollection.push({
-        viewId: action.payload.viewId,
+        id: action.payload.id,
         title: action.payload.title,
         isLoading: false,
         messages: action.payload.messages,
@@ -161,13 +161,13 @@ const chatViewSlice = createSlice({
       });
     },
     markAsRead: (state, action) => {
-      const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+      const chatView = state.chatViewCollection.find(cv => cv.id === action.payload);
       if (chatView) {
         chatView.unreadCount = 0;
       }
     },
     incrementUnreadCount: (state, action) => {
-      const chatView = state.chatViewCollection.find(cv => cv.viewId === action.payload);
+      const chatView = state.chatViewCollection.find(cv => cv.id === action.payload);
       if (chatView) {
         chatView.unreadCount = (chatView.unreadCount || 0) + 1;
       }
@@ -178,14 +178,14 @@ const chatViewSlice = createSlice({
       // fetchAllMessages
       .addCase(fetchAllMessages.pending, (state, action) => {
         const chatViewId = action.meta.arg;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = true;
         }
       })
       .addCase(fetchAllMessages.fulfilled, (state, action) => {
         const { chatViewId, messages } = action.payload;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = false;
           view.messages = messages;
@@ -194,7 +194,7 @@ const chatViewSlice = createSlice({
       })
       .addCase(fetchAllMessages.rejected, (state, action) => {
         const chatViewId = action.meta.arg;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = false;
           view.error = action.error.message || 'Failed to fetch messages';
@@ -203,14 +203,14 @@ const chatViewSlice = createSlice({
       // fetchMessagesFromQueue
       .addCase(fetchMessagesFromQueue.pending, (state, action) => {
         const chatViewId = action.meta.arg;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = true;
         }
       })
       .addCase(fetchMessagesFromQueue.fulfilled, (state, action) => {
         const { chatViewId, messages } = action.payload;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = false;
           const localStorageMessages = JSON.parse(localStorage.getItem(`messages_${chatViewId}`) || '[]');
@@ -221,7 +221,7 @@ const chatViewSlice = createSlice({
       })
       .addCase(fetchMessagesFromQueue.rejected, (state, action) => {
         const chatViewId = action.meta.arg;
-        const view = state.chatViewCollection.find(view => view.viewId === chatViewId);
+        const view = state.chatViewCollection.find(view => view.id === chatViewId);
         if (view) {
           view.isLoading = false;
           view.error = action.error.message || 'Failed to fetch messages';
@@ -254,7 +254,7 @@ export const selectAllUserAvatars = (state: { chatView: ChatViewState }): Array<
 
 export const selectChatViewIds = createSelector(
   [(state: { chatView: ChatViewState }) => state.chatView.chatViewCollection],
-  (chatViewCollection) => chatViewCollection.map(cv => cv.viewId)
+  (chatViewCollection) => chatViewCollection.map(cv => cv.id)
 );
 
 export default chatViewSlice.reducer;

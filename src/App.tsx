@@ -36,7 +36,7 @@ function App() {
             </ProtectedRoute>
           }>
             {/*here are child components to be rendered inside of outlet */}
-            <Route path="/" element={<ChatView viewId={currentlyDisplayedChatView} />} />
+            <Route path="/" element={<ChatView id={currentlyDisplayedChatView} />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 

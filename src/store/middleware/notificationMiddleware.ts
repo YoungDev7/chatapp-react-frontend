@@ -7,13 +7,13 @@ export const notificationMiddleware: Middleware = (store) => (next) => (action) 
     if (addMessage.match(action)) {
         const state = store.getState();
         const { user } = state.auth;
-        const { viewId, message } = action.payload;
-        
+        const { id, message } = action.payload;
+
         // Only notify if message is from someone else
         if (message.senderName !== user.name) {
-            store.dispatch(incrementUnreadCount(viewId));
-            
-            const chatView = state.chatView.chatViewCollection.find((cv: { viewId: string; title: string }) => cv.viewId === viewId);
+            store.dispatch(incrementUnreadCount(id));
+
+            const chatView = state.chatView.chatViewCollection.find((cv: { id: string; title: string }) => cv.id === id);
             if (chatView && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
                 new Notification(`New message in ${chatView.title}`, {
                     body: `${message.senderName}: ${message.text}`,

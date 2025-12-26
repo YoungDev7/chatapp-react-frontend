@@ -1,5 +1,5 @@
 export type SidebarItemProps = {
-  viewId: string;
+  chatviewId: string;
   title: string;
   isLoading: boolean;
 }

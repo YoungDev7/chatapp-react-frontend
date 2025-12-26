@@ -1,7 +1,7 @@
 import type { Message } from './message';
 
 export type ChatView = {
-  viewId: string;
+  id: string;
   title: string;
   messages: Message[];
   isLoading: boolean;

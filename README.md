@@ -176,7 +176,7 @@ The application uses WebSocket/STOMP for real-time communication:
 ```typescript
 {
   chatViewCollection: [{
-    viewId: number,
+    id: number,
     title: string,
     messages: Message[],
     isLoading: boolean,

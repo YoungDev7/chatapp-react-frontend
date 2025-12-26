@@ -22,27 +22,27 @@ import MessageContainer from './MessageContainer';
  * 
  * @returns {React.ReactElement} Chat interface with message display and input
  */
-export default function ChatView({ viewId }: ChatViewProps) {
+export default function ChatView({ id }: ChatViewProps) {
   const dispatch = useAppDispatch();
   const { stompClient, connectionStatus } = useAppSelector(state => state.ws);
   const { toggleDrawer, isMobile } = useLayout();
   const chatView = useAppSelector(
-    state => state.chatView.chatViewCollection.find(view => view.viewId === viewId),
+    state => state.chatView.chatViewCollection.find(view => view.id === id),
     shallowEqual
   );
 
   // Mark chat as read when it becomes the active view
   useEffect(() => {
-    if (viewId) {
-      dispatch(markAsRead(viewId));
+    if (id) {
+      dispatch(markAsRead(id));
     }
-  }, [viewId, dispatch]);
+  }, [id, dispatch]);
 
   //SENDING MESSAGE
   function handleMessageSend(message: string) {
     if (stompClient && connectionStatus === 'connected') {
       stompClient.publish({
-        destination: `/app/chatview/${viewId}`,
+        destination: `/app/chatview/${id}`,
         body: JSON.stringify({ text: message, createdAt: new Date().toISOString() })
       });
     }

@@ -1,15 +1,15 @@
 import type { ChatView } from '../types/chatView';
 
 /**
- * Deduplicates chats by viewId, keeping the first occurrence
+ * Deduplicates chats by id, keeping the first occurrence
  */
 function deduplicateChats(chats: ChatView[]): ChatView[] {
   const seenIds = new Set<string>();
   return chats.filter(chat => {
-    if (seenIds.has(chat.viewId)) {
+    if (seenIds.has(chat.id)) {
       return false;
     }
-    seenIds.add(chat.viewId);
+    seenIds.add(chat.id);
     return true;
   });
 }

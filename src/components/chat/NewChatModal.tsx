@@ -125,7 +125,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
 
       // Update Redux state
       dispatch(addChatView({
-        viewId: newChatId,
+        id: newChatId,
         title: chatName.trim(),
         messages: [],
         isLoading: false,

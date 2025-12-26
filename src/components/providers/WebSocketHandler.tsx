@@ -168,7 +168,7 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
 
                 subscribedViewsRef.current.add("notifications");
                 failedSubscriptionsRef.current.delete("notifications");
-                dispatch(addSubscription({ viewId: "notifications", subscription }));
+                dispatch(addSubscription({ id: "notifications", subscription }));
                 console.log(`Subscribed to /user/notifications`);
             } catch (error) {
                 console.error(`Failed to subscribe to /user/notifications:`, error);
@@ -179,32 +179,32 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
 
     function subscribeToChatView(chatView: ChatView) {
         if (stompClient && connectionStatus === 'connected' && user.uid) {
-            if (subscribedViewsRef.current.has(chatView.viewId)) {
+            if (subscribedViewsRef.current.has(chatView.id)) {
                 return;
             }
 
-            const failCount = failedSubscriptionsRef.current.get(chatView.viewId) || 0;
+            const failCount = failedSubscriptionsRef.current.get(chatView.id) || 0;
             if (failCount >= MAX_RETRY_ATTEMPTS) {
-                console.warn(`Skipping subscription to ${chatView.viewId} - max retry attempts reached`);
+                console.warn(`Skipping subscription to ${chatView.id} - max retry attempts reached`);
                 return;
             }
 
-            const destination = getChatViewWSDestination(chatView.viewId, user.uid!);
+            const destination = getChatViewWSDestination(chatView.id, user.uid!);
 
             try {
                 const subscription = stompClient.subscribe(destination, (message: { body: string }) => {
                     const newMessage = JSON.parse(message.body);
-                    console.log(`Received message in chatview ${chatView.viewId}:`, newMessage);
-                    dispatch(addMessage({ viewId: chatView.viewId, message: newMessage }));
+                    console.log(`Received message in chatview ${chatView.id}:`, newMessage);
+                    dispatch(addMessage({ id: chatView.id, message: newMessage }));
                 });
 
-                subscribedViewsRef.current.add(chatView.viewId);
-                failedSubscriptionsRef.current.delete(chatView.viewId);
-                dispatch(addSubscription({ viewId: chatView.viewId, subscription }));
+                subscribedViewsRef.current.add(chatView.id);
+                failedSubscriptionsRef.current.delete(chatView.id);
+                dispatch(addSubscription({ id: chatView.id, subscription }));
                 console.log(`Subscribed to ${destination}`);
             } catch (error) {
                 console.error(`Failed to subscribe to ${destination}:`, error);
-                failedSubscriptionsRef.current.set(chatView.viewId, failCount + 1);
+                failedSubscriptionsRef.current.set(chatView.id, failCount + 1);
             }
         }
     }
