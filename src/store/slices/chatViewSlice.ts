@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice } from '@reduxjs/toolkit';
 import api from '../../services/Api';
 import type { ChatView } from '../../types/chatView';
 import { clearAuth } from './authSlice';
@@ -250,5 +250,11 @@ export const selectUserAvatar = (state: { chatView: ChatViewState }, userId: str
 export const selectAllUserAvatars = (state: { chatView: ChatViewState }): Array<[string, string]> => {
   return Array.from(state.chatView.userAvatars.entries());
 };
+
+
+export const selectChatViewIds = createSelector(
+  [(state: { chatView: ChatViewState }) => state.chatView.chatViewCollection],
+  (chatViewCollection) => chatViewCollection.map(cv => cv.viewId)
+);
 
 export default chatViewSlice.reducer;

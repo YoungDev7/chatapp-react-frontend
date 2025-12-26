@@ -2,8 +2,9 @@ import { Client } from '@stomp/stompjs';
 import { useEffect, useRef, type ReactNode } from 'react';
 import SockJS from 'sockjs-client';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { addMessage } from '../store/slices/chatViewSlice';
+import { addMessage, selectChatViewIds } from '../store/slices/chatViewSlice';
 import { addSubscription, clearAllSubscriptions, setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
+import type { ChatView } from '../types/chatView';
 import { handleNotification, type NotificationDTO } from '../utils/notificationUtils';
 import { getChatViewWSDestination } from '../utils/wsUtils';
 
@@ -119,11 +120,37 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, isLoadingChatViews, dispatch]);
 
+    const chatViewIds = useAppSelector(selectChatViewIds);
+
     // Subscribe to all chat views when connected and subscribe to new ones when added
     useEffect(() => {
         if (stompClient && connectionStatus === 'connected' && user.uid) {
 
-            // SUBSCRIBE TO NOTIFICATIONS
+            console.log("use effect was triggered");
+
+            subscribeToNotifications();
+
+            if (chatViewCollection.length == 0) {
+                console.log("no chatviews to subscribe to");
+                return;
+            }
+
+            // SUBSCRIBE TO CHATVIEWS
+            chatViewCollection.forEach(chatView => {
+                subscribeToChatView(chatView);
+            });
+        }
+
+        if (connectionStatus !== 'connected') {
+            subscribedViewsRef.current.clear();
+            failedSubscriptionsRef.current.clear();
+        }
+    }, [stompClient, connectionStatus, chatViewCollection.length, user.uid, dispatch]); // Changed: use .length instead of chatViewIds
+
+
+    function subscribeToNotifications() {
+        if (stompClient && connectionStatus === 'connected' && user.uid) {
+
             if (subscribedViewsRef.current.has("notifications")) {
                 return;
             }
@@ -149,50 +176,40 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
                 console.error(`Failed to subscribe to /user/notifications:`, error);
                 failedSubscriptionsRef.current.set("notifications", failCount + 1);
             }
+        }
+    }
 
-            if (chatViewCollection.length == 0) {
-                console.log("no chatviews to subscribe to");
+    function subscribeToChatView(chatView: ChatView) {
+        if (stompClient && connectionStatus === 'connected' && user.uid) {
+            if (subscribedViewsRef.current.has(chatView.viewId)) {
                 return;
             }
 
-            // SUBSCRIBE TO CHATVIEWS
-            chatViewCollection.forEach(chatView => {
-                if (subscribedViewsRef.current.has(chatView.viewId)) {
-                    return;
-                }
+            const failCount = failedSubscriptionsRef.current.get(chatView.viewId) || 0;
+            if (failCount >= MAX_RETRY_ATTEMPTS) {
+                console.warn(`Skipping subscription to ${chatView.viewId} - max retry attempts reached`);
+                return;
+            }
 
-                const failCount = failedSubscriptionsRef.current.get(chatView.viewId) || 0;
-                if (failCount >= MAX_RETRY_ATTEMPTS) {
-                    console.warn(`Skipping subscription to ${chatView.viewId} - max retry attempts reached`);
-                    return;
-                }
+            const destination = getChatViewWSDestination(chatView.viewId, user.uid!);
 
-                const destination = getChatViewWSDestination(chatView.viewId, user.uid!);
+            try {
+                const subscription = stompClient.subscribe(destination, (message: { body: string }) => {
+                    const newMessage = JSON.parse(message.body);
+                    console.log(`Received message in chatview ${chatView.viewId}:`, newMessage);
+                    dispatch(addMessage({ viewId: chatView.viewId, message: newMessage }));
+                });
 
-                try {
-                    const subscription = stompClient.subscribe(destination, (message: { body: string }) => {
-                        const newMessage = JSON.parse(message.body);
-                        console.log(`Received message in chatview ${chatView.viewId}:`, newMessage);
-                        dispatch(addMessage({ viewId: chatView.viewId, message: newMessage }));
-                    });
-
-                    subscribedViewsRef.current.add(chatView.viewId);
-                    failedSubscriptionsRef.current.delete(chatView.viewId);
-                    dispatch(addSubscription({ viewId: chatView.viewId, subscription }));
-                    console.log(`Subscribed to ${destination}`);
-                } catch (error) {
-                    console.error(`Failed to subscribe to ${destination}:`, error);
-                    failedSubscriptionsRef.current.set(chatView.viewId, failCount + 1);
-                }
-            });
+                subscribedViewsRef.current.add(chatView.viewId);
+                failedSubscriptionsRef.current.delete(chatView.viewId);
+                dispatch(addSubscription({ viewId: chatView.viewId, subscription }));
+                console.log(`Subscribed to ${destination}`);
+            } catch (error) {
+                console.error(`Failed to subscribe to ${destination}:`, error);
+                failedSubscriptionsRef.current.set(chatView.viewId, failCount + 1);
+            }
         }
-
-        if (connectionStatus !== 'connected') {
-            subscribedViewsRef.current.clear();
-            failedSubscriptionsRef.current.clear();
-        }
-    }, [stompClient, connectionStatus, chatViewCollection, user.uid, dispatch]);
-
+    }
 
     return children;
 }
