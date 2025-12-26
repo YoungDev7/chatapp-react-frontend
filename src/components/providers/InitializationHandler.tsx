@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
-import { useAppDispatch } from '../store/hooks';
-import { addChatView, addUserAvatars, fetchAllMessages, fetchChatViews, fetchMessagesFromQueue, setIsLoadingChatViews } from '../store/slices/chatViewSlice';
-import type { AppDispatch } from '../store/store';
+import { useAppDispatch } from '../../store/hooks';
+import { addChatView, addUserAvatars, fetchAllMessages, fetchChatViews, fetchMessagesFromQueue, setIsLoadingChatViews } from "../../store/slices/chatViewSlice";
+import type { AppDispatch } from '../../store/store';
 
 function retrieveStoredMessages(chatViewId: string) {
     const storedMessages = localStorage.getItem(`messages_${chatViewId}`);

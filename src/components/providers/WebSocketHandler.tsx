@@ -1,12 +1,12 @@
 import { Client } from '@stomp/stompjs';
 import { useEffect, useRef, type ReactNode } from 'react';
 import SockJS from 'sockjs-client';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { addMessage, selectChatViewIds } from '../store/slices/chatViewSlice';
-import { addSubscription, clearAllSubscriptions, setConnectionStatus, setStompClient } from '../store/slices/wsSlice';
-import type { ChatView } from '../types/chatView';
-import { handleNotification, type NotificationDTO } from '../utils/notificationUtils';
-import { getChatViewWSDestination } from '../utils/wsUtils';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addMessage } from '../../store/slices/chatViewSlice';
+import { addSubscription, clearAllSubscriptions, setConnectionStatus, setStompClient } from '../../store/slices/wsSlice';
+import type { ChatView } from '../../types/chatView';
+import { handleNotification, type NotificationDTO } from '../../utils/notificationUtils';
+import { getChatViewWSDestination } from '../../utils/wsUtils';
 
 
 /**
@@ -120,8 +120,6 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, isLoadingChatViews, dispatch]);
 
-    const chatViewIds = useAppSelector(selectChatViewIds);
-
     // Subscribe to all chat views when connected and subscribe to new ones when added
     useEffect(() => {
         if (stompClient && connectionStatus === 'connected' && user.uid) {
@@ -145,7 +143,7 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
             subscribedViewsRef.current.clear();
             failedSubscriptionsRef.current.clear();
         }
-    }, [stompClient, connectionStatus, chatViewCollection.length, user.uid, dispatch]); // Changed: use .length instead of chatViewIds
+    }, [stompClient, connectionStatus, chatViewCollection.length, user.uid, dispatch]);
 
 
     function subscribeToNotifications() {

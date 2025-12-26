@@ -13,7 +13,7 @@ import { handleLogout } from '../../store/slices/authSlice';
 import { getFilteredAndSortedChats } from '../../utils/chatFilterUtils';
 import NewChatButton from '../chat/NewChatButton';
 import NewChatModal from '../chat/NewChatModal';
-import SearchBar from '../ui/SearchBar';
+import SearchBar from '../common/SearchBar';
 import SidebarItem from './SidebarItem';
 
 
@@ -39,8 +39,8 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
 
   return (
     <Paper
-      elevation={isMobile ? 0 : 2} 
-      sx={{ 
+      elevation={isMobile ? 0 : 2}
+      sx={{
         height: '100%',
         backgroundColor: (theme) => theme.palette.custom.secondaryDark,
         borderRadius: isMobile ? 0 : 2,
@@ -73,10 +73,10 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
             <SidebarItem key={chat.viewId} viewId={chat.viewId} title={chat.title} isLoading={chat.isLoading} />
           ))
         ) : (
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              justifyContent: 'center', 
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
               alignItems: 'center',
               height: '100px',
               color: 'rgba(255, 255, 255, 0.5)'
@@ -86,7 +86,7 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
           </Box>
         )}
       </List>
-      
+
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Button
           href="/profile"
@@ -122,6 +122,6 @@ export default function Sidebar({ isMobile = false }: { isMobile?: boolean }): R
           Logout
         </Button>
       </Box>
-  </Paper>
+    </Paper>
   );
 }

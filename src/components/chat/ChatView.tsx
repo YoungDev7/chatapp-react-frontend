@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { markAsRead } from '../../store/slices/chatViewSlice';
 import type { ChatViewProps } from '../../types/chatViewProps';
-import { useLayout } from '../Layout';
+import { useLayout } from '../layout/Layout';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import MessageContainer from './MessageContainer';
@@ -50,8 +50,8 @@ export default function ChatView({ viewId }: ChatViewProps) {
 
 
   return (
-    <Box 
-      sx={{ 
+    <Box
+      sx={{
         width: '100%',
         height: '100%',
         display: 'flex',
@@ -60,19 +60,19 @@ export default function ChatView({ viewId }: ChatViewProps) {
         overflow: 'hidden'
       }}
     >
-      <ChatHeader 
+      <ChatHeader
         title={chatView?.title || '{chatview title}'}
         isMobile={isMobile}
         onMenuClick={toggleDrawer}
       />
 
       {chatView?.isLoading ? (
-        <Box 
-          sx={{ 
-            flexGrow: 1, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center' 
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           <CircularProgress size={60} />
@@ -83,7 +83,7 @@ export default function ChatView({ viewId }: ChatViewProps) {
             <MessageContainer messages={chatView?.messages || []} />
           </Box>
 
-          <ChatInput 
+          <ChatInput
             onSendMessage={handleMessageSend}
             disabled={connectionStatus !== 'connected'}
           />

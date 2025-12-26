@@ -1,21 +1,21 @@
 import {
   Box,
   Button,
-  TextField,
+  Chip,
+  CircularProgress,
   List,
   ListItemButton,
   ListItemText,
-  Chip,
-  CircularProgress,
-  Typography,
-  Paper
+  Paper,
+  TextField,
+  Typography
 } from '@mui/material';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addChatView } from '../../store/slices/chatViewSlice';
-import BaseModal from '../ui/BaseModal';
-import { searchUser, type User } from '../../utils/userUtils';
 import { createChat } from '../../utils/newChatUtils';
+import { searchUser, type User } from '../../utils/userUtils';
+import BaseModal from '../common/BaseModal';
 
 interface NewChatModalProps {
   open: boolean;
@@ -38,7 +38,7 @@ interface NewChatModalProps {
 export default function NewChatModal({ open, onClose }: NewChatModalProps) {
   const dispatch = useAppDispatch();
   const { user: currentUser } = useAppSelector(state => state.auth);
-  
+
   const [chatName, setChatName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
@@ -58,13 +58,13 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
     setError(null);
     try {
       const foundUser = await searchUser(query);
-      
+
       if (!foundUser) {
         setSearchResults([]);
         setError(null);
         return;
       }
-      
+
       // Don't show already selected users or current user in search results
       const isAlreadySelected = selectedUsers.some(u => u.uid === foundUser.uid);
       const isCurrentUser = foundUser.uid === currentUser.uid;
@@ -94,7 +94,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
       setError('You cannot add yourself to the chat');
       return;
     }
-    
+
     setSelectedUsers([...selectedUsers, user]);
     setSearchQuery('');
     setSearchResults([]);

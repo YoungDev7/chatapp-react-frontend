@@ -6,13 +6,13 @@ import AuthHandler from './components/auth/AuthHandler';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import ChatView from './components/chat/ChatView';
-import InitializationHandler from './components/InitializationHandler';
-import Layout from './components/Layout';
-import Profile from './components/Profile';
-import ProtectedRoute from './components/ProtectedRoute';
-import WebSocketHandler from './components/WebSocketHandler';
+import Layout from './components/layout/Layout';
+import Profile from './components/profile/Profile';
+import InitializationHandler from './components/providers/InitializationHandler';
+import ProtectedRoute from './components/providers/ProtectedRoute';
+import WebSocketHandler from './components/providers/WebSocketHandler';
 import { useAppSelector } from './store/hooks';
-import theme from './theme';
+import theme from './theme/theme';
 
 function App() {
   const { currentlyDisplayedChatView } = useAppSelector(state => state.chatView);

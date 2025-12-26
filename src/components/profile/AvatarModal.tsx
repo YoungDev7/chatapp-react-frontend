@@ -5,8 +5,8 @@ import {
   Button,
   TextField
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
-import BaseModal from './ui/BaseModal';
+import React, { useEffect, useState } from 'react';
+import BaseModal from '../common/BaseModal';
 
 type Props = {
   open: boolean;

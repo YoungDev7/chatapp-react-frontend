@@ -1,6 +1,6 @@
 import { Box, Drawer, useMediaQuery, useTheme } from '@mui/material';
 import React, { createContext, useContext, useState } from 'react';
-import Sidebar from './sidebar/Sidebar';
+import Sidebar from './Sidebar';
 
 type Props = {
   children: React.ReactNode;
@@ -57,10 +57,10 @@ export default function Layout({ children }: Props) {
       )}
 
       {/* Main Content */}
-      <Box sx={{ 
-        width: { xs: '100vw', md: '70vw' }, 
-        flexGrow: 1, 
-        display: 'flex', 
+      <Box sx={{
+        width: { xs: '100vw', md: '70vw' },
+        flexGrow: 1,
+        display: 'flex',
         flexDirection: 'column',
         position: 'relative',
         p: { xs: 1, md: 0 }

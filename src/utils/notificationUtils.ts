@@ -1,4 +1,4 @@
-import { initializeSingleChatView } from '../components/InitializationHandler';
+import { initializeSingleChatView } from '../components/providers/InitializationHandler';
 import { fetchChatViewDetails } from '../store/slices/chatViewSlice';
 import type { AppDispatch } from '../store/store';
 
