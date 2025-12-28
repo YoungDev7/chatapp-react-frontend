@@ -20,6 +20,39 @@ export default [
       ...js.configs.recommended.rules,
     },
   },
+  // Test files - with Jest globals
+  {
+    files: ['**/*.test.{ts,tsx}', '**/*.spec.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+      },
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+        project: './tsconfig.test.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    settings: { react: { version: '18.3' } },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      ...tseslint.configs.recommended.rules,
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
+    },
+  },
   // TypeScript source files - with type-aware linting
   {
     files: ['src/**/*.{ts,tsx}'],
