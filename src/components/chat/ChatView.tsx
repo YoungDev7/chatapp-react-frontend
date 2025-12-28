@@ -30,6 +30,7 @@ export default function ChatView({ id }: ChatViewProps) {
     state => state.chatView.chatViewCollection.find(view => view.id === id),
     shallowEqual
   );
+  const isGroupChat = chatView ? chatView.userCount > 2 : false;
 
   // Mark chat as read when it becomes the active view
   useEffect(() => {
@@ -63,6 +64,7 @@ export default function ChatView({ id }: ChatViewProps) {
       <ChatHeader
         title={chatView?.title || '{chatview title}'}
         isMobile={isMobile}
+        isGroupChat={isGroupChat}
         onMenuClick={toggleDrawer}
       />
 

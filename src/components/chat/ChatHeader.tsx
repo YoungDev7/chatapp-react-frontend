@@ -1,10 +1,11 @@
-import { faBars, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, IconButton } from '@mui/material';
 
 interface ChatHeaderProps {
   title: string;
   isMobile?: boolean;
+  isGroupChat: boolean;
   onMenuClick?: () => void;
 }
 
@@ -17,10 +18,10 @@ interface ChatHeaderProps {
  * @param {function} props.onMenuClick - Callback function when menu button is clicked
  * @returns {React.ReactElement} Chat header interface
  */
-export default function ChatHeader({ title, isMobile = false, onMenuClick }: ChatHeaderProps) {
+export default function ChatHeader({ title, isMobile = false, isGroupChat, onMenuClick }: ChatHeaderProps) {
   return (
     <Box
-      sx={{ 
+      sx={{
         height: '55px',
         backgroundColor: (theme) => theme.palette.custom.secondaryDark,
         color: 'white',
@@ -50,7 +51,7 @@ export default function ChatHeader({ title, isMobile = false, onMenuClick }: Cha
           <FontAwesomeIcon icon={faBars} />
         </IconButton>
       )}
-      <FontAwesomeIcon icon={faUsers} size="lg" />
+      <FontAwesomeIcon icon={isGroupChat ? faUsers : faUser} size="lg" />
       <Box sx={{ fontSize: '1.1rem', fontWeight: 500 }}>
         {title}
       </Box>

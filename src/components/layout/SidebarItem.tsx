@@ -21,7 +21,7 @@ export default function SidebarItem({ chatviewId, title, isLoading }: SidebarIte
     const isActive = currentlyDisplayedChatView === chatviewId;
 
     const chatView = chatViewCollection.find((chat: ChatView) => chat.id === chatviewId);
-    const isGroupChat = chatView!.userCount < 3 ? false : true;
+    const isGroupChat = chatView!.userCount > 2;
     const lastMessage = chatView?.messages && chatView.messages.length > 0
         ? chatView.messages[chatView.messages.length - 1]
         : null;

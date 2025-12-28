@@ -12,8 +12,7 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { addChatView } from '../../store/slices/chatViewSlice';
-import { createChat } from '../../utils/newChatUtils';
+import { createChatView } from '../../store/slices/chatViewSlice';
 import { searchUser, type User } from '../../utils/userUtils';
 import BaseModal from '../common/BaseModal';
 
@@ -120,19 +119,10 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
     setError(null);
 
     try {
-      // Create chat with title and users
-      const newChatId = await createChat(chatName.trim(), selectedUsers);
+      const userUids = selectedUsers.map(user => user.uid);
+      await dispatch(createChatView({ name: chatName.trim(), userUids })).unwrap();
 
-      // Update Redux state
-      dispatch(addChatView({
-        id: newChatId,
-        title: chatName.trim(),
-        messages: [],
-        isLoading: false,
-        error: null
-      }));
-
-      // Reset state
+      // Reset state and close modal
       setChatName('');
       setSelectedUsers([]);
       setSearchQuery('');

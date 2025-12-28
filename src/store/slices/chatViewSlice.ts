@@ -108,6 +108,23 @@ export const fetchChatViewDetails = createAsyncThunk(
   }
 )
 
+export const createChatView = createAsyncThunk(
+  'chatView/createChatView',
+  async ({ name, userUids }: { name: string; userUids: string[] }, { rejectWithValue }) => {
+    try {
+      await api.post('/chatviews', { name, userUids });
+      // No need to return anything - backend will automatically fetch the new chatview
+    } catch (error: unknown) {
+      console.error('Error creating chatview:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const responseData = (error && typeof error === 'object' && 'response' in error)
+        ? (error as { response?: { data?: unknown } }).response?.data
+        : undefined;
+      return rejectWithValue(responseData || errorMessage);
+    }
+  }
+)
+
 
 /**
  * Redux slice for managing chat view state.
