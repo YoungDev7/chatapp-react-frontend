@@ -3,11 +3,14 @@ import { useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { markAsRead } from '../../store/slices/chatViewSlice';
-import type { ChatViewProps } from '../../types/chatViewProps';
 import { useLayout } from '../layout/Layout';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import MessageContainer from './MessageContainer';
+
+interface ChatViewProps {
+  id: string;
+}
 
 /**
  * ChatView component that displays the main chat interface.

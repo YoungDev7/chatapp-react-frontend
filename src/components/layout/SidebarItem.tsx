@@ -11,7 +11,12 @@ import {
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setCurrentlyDisplayedChatView } from '../../store/slices/chatViewSlice';
 import type { ChatView } from '../../types/chatView';
-import type { SidebarItemProps } from '../../types/sidebarItemProps';
+
+interface SidebarItemProps {
+    chatviewId: string;
+    title: string;
+    isLoading: boolean;
+}
 
 export default function SidebarItem({ chatviewId, title, isLoading }: SidebarItemProps) {
     const dispatch = useAppDispatch();

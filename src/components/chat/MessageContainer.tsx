@@ -1,14 +1,18 @@
 import { Box } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import type { MessageContainerProps } from '../../types/messageContainerProps';
+import type { Message } from '../../types/message';
 import { formatMessageTimestamp, shouldShowTimestamp } from '../../utils/timestampUtils';
 import ChatMessage from './ChatMessage';
+
+interface MessageContainerProps {
+  messages: Message[];
+}
 
 //this component is container in which all messages are rendered
 const MessageContainer = ({ messages }: MessageContainerProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { user } = useAppSelector(state => state.auth); 
+  const { user } = useAppSelector(state => state.auth);
   const userAvatars = useAppSelector(state => state.chatView.userAvatars);
 
 
@@ -21,7 +25,7 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
 
   if (!messages || !Array.isArray(messages)) {
     return (
-      <Box 
+      <Box
         sx={{
           backgroundColor: (theme) => theme.palette.custom.secondaryDark,
           display: 'flex',
@@ -35,7 +39,7 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
   }
 
   return (
-    <Box 
+    <Box
       ref={containerRef}
       sx={{
         backgroundColor: (theme) => theme.palette.custom.secondaryDark,
@@ -50,27 +54,27 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
         if (!message || !message.senderName || !message.text) {
           return null;
         }
-        
+
         try {
           const showSender = index === 0 || messages[index - 1]?.senderName !== message.senderName;
-          
+
           const currentMessageTime = message.createdAt ? new Date(message.createdAt) : null;
           const nextMessage = messages[index + 1];
           const nextMessageTime = nextMessage?.createdAt ? new Date(nextMessage.createdAt) : null;
-          
+
           let showAvatar = false;
-          
+
           if (index === messages.length - 1) {
             showAvatar = true;
           } else if (messages[index + 1]?.senderName !== message.senderName) {
             showAvatar = true;
           } else if (currentMessageTime && nextMessageTime) {
-            const sameMinute = 
+            const sameMinute =
               currentMessageTime.getHours() === nextMessageTime.getHours() &&
               currentMessageTime.getMinutes() === nextMessageTime.getMinutes();
             showAvatar = !sameMinute;
           }
-          
+
           let showTimestamp = false;
           if (message.createdAt) {
             const previousMessage = index > 0 ? messages[index - 1] : null;
@@ -84,7 +88,7 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
 
           const senderAvatarLink = userAvatars.get(message.senderUid) || '';
 
-          
+
           return (
             <>
               {showTimestamp && message.createdAt && (
@@ -99,13 +103,13 @@ const MessageContainer = ({ messages }: MessageContainerProps) => {
                   {formatMessageTimestamp(message.createdAt)}
                 </Box>
               )}
-              <ChatMessage 
+              <ChatMessage
                 key={`message-${index}-${message.senderName}`}
-                text={message.text} 
-                sender={message.senderName} 
+                text={message.text}
+                sender={message.senderName}
                 senderUid={message.senderUid}
                 senderAvatarLink={senderAvatarLink}
-                isUser={message.senderName === user.name} 
+                isUser={message.senderName === user.name}
                 showSender={showSender}
                 showAvatar={showAvatar}
                 timestamp={undefined}

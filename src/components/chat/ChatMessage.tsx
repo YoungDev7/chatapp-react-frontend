@@ -1,25 +1,35 @@
 import { Avatar } from '@mui/material';
 import '../../style/ChatMessage.css';
-import type { ChatMessageProps } from '../../types/chatMessageProps';
 import { getAvatarColor, getAvatarInitial } from '../../utils/avatarUtils';
 import { isEmojiOnly } from '../../utils/emojiUtils';
 import { formatMessageTimestamp } from '../../utils/timestampUtils';
 
+interface ChatMessageProps {
+  sender: string;
+  senderUid: string;
+  senderAvatarLink: string;
+  text: string;
+  isUser: boolean;
+  showSender: boolean;
+  showAvatar: boolean;
+  timestamp?: string | number;
+  showTimestamp?: boolean;
+}
 
-export default function ChatMessage({sender, senderAvatarLink, text, isUser, showSender, showAvatar, timestamp, showTimestamp}: ChatMessageProps) {
+export default function ChatMessage({ sender, senderAvatarLink, text, isUser, showSender, showAvatar, timestamp, showTimestamp }: ChatMessageProps) {
   const isEmojiOnlyMessage = isEmojiOnly(text);
-  
+
   return (
     <div className={`message ${isUser ? 'usersMessage' : 'othersMessage'} ${!showSender ? 'groupedMessage' : ''}`}>
       <div className="messageRow">
         {!isUser && (
-          <Avatar 
+          <Avatar
             className="messageAvatar"
             src={senderAvatarLink || undefined}
             alt={sender}
-            sx={{ 
-              width: 40, 
-              height: 40, 
+            sx={{
+              width: 40,
+              height: 40,
               fontSize: '12px',
               backgroundColor: getAvatarColor(sender),
               alignSelf: 'flex-end',
