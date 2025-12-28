@@ -208,7 +208,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           disabled={isCreating}
-          placeholder="Search by username or email (excluding yourself)"
+          placeholder="Search by username"
           sx={{
             '& .MuiOutlinedInput-root': {
               color: 'white',
@@ -234,7 +234,7 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
         {searchQuery.trim() && (
           <Paper
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: searchResults.length > 0 ? 'primary.main' : 'rgba(255, 255, 255, 0.05)',
               maxHeight: '200px',
               overflowY: 'auto',
               border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -283,9 +283,6 @@ export default function NewChatModal({ open, onClose }: NewChatModalProps) {
               <Box sx={{ p: 2 }}>
                 <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
                   No users found
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
-                  Note: You cannot add yourself to a chat
                 </Typography>
               </Box>
             )}
