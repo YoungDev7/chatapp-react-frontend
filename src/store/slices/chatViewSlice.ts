@@ -151,6 +151,7 @@ const chatViewSlice = createSlice({
         title: action.payload.title,
         isLoading: false,
         messages: action.payload.messages,
+        userCount: action.payload.userCount,
         error: null
       });
     },

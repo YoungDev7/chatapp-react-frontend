@@ -34,6 +34,7 @@ export function initializeSingleChatView(
         id: chatView.id,
         title: chatView.name,
         messages: parsedStoredmessages,
+        userCount: Object.keys(chatView.userAvatars).length
     }));
 
     if (chatView.userAvatars) {

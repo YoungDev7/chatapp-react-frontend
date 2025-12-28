@@ -31,8 +31,8 @@ import PasswordField from './PasswordField';
  * @returns {React.ReactElement} Registration form or feedback component
  */
 export default function Register() {
-    const [ isSubmitted, setIsSubmitted ] = useState(false);
-    const [ isRegistrationSuccess, setIsRegistrationSuccess ] = useState<boolean | null>(null);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isRegistrationSuccess, setIsRegistrationSuccess] = useState<boolean | null>(null);
     const [emailError, setEmailError] = useState(false);
     const [emailErrorMessage, setEmailErrorMessage] = useState('');
     const [passwordError, setPasswordError] = useState(false);
@@ -48,16 +48,16 @@ export default function Register() {
         username: '',
         email: '',
         password: '',
-        passwordConfirm: '',
     });
+    const [passwordConfirm, setPasswordConfirm] = useState('');
 
     const clearAllFields = () => {
         setCredentials({
             username: '',
             email: '',
             password: '',
-            passwordConfirm: '',
         });
+        setPasswordConfirm('');
         setEmailError(false);
         setEmailErrorMessage('');
         setPasswordError(false);
@@ -67,12 +67,15 @@ export default function Register() {
         setNameError(false);
         setNameErrorMessage('');
     };
-     
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
-        const validation = validateRegistrationInputs(credentials);
-        
+
+        const validation = validateRegistrationInputs({
+            ...credentials,
+            passwordConfirm
+        });
+
         if (!validation.isValid) {
             setEmailError(validation.errors.emailError);
             setEmailErrorMessage(validation.errors.emailErrorMessage);
@@ -84,40 +87,40 @@ export default function Register() {
             setNameErrorMessage(validation.errors.nameErrorMessage);
             return;
         }
-        
+
         setIsSubmitted(true);
         setIsLoginSuccess(null);
         setIsRegistrationSuccess(null);
 
-        try{
-            await api.post('/auth/register', credentials, {skipAuthInterceptor: true});
+        try {
+            await api.post('/auth/register', credentials, { skipAuthInterceptor: true });
             setIsRegistrationSuccess(true);
-            
-            try{
+
+            try {
                 const responseLogin = await api.post('/auth/authenticate', { email: credentials.email, password: credentials.password }, { skipAuthInterceptor: true });
                 dispatch(setToken(responseLogin.data.access_token));
                 dispatch(setUser(responseLogin.data.access_token));
                 setIsLoginSuccess(true);
                 clearAllFields();
                 navigate('/');
-            }catch(error){
+            } catch (error) {
                 setIsLoginSuccess(false);
                 console.log("login after registration failed: " + error);
             }
-            
-        }catch(error){
+
+        } catch (error) {
             setIsRegistrationSuccess(false);
             console.error("registration error " + error);
-        }finally{
+        } finally {
             setIsSubmitted(false);
         }
     };
 
     let buttonContent;
     if (isSubmitted) {
-    buttonContent = <CircularProgress size={24} sx={{ color: 'white' }} />;
+        buttonContent = <CircularProgress size={24} sx={{ color: 'white' }} />;
     } else {
-    buttonContent = 'Register';
+        buttonContent = 'Register';
     }
 
     return (
@@ -155,149 +158,146 @@ export default function Register() {
                         </Grow>
                     </Box>
                 )}
-            <Paper
-                elevation={3}
-                sx={{
-                    p: { xs: 3, md: 5 },
-                    width: '100%',
-                    maxWidth: 400,
-                    backgroundColor: 'grey.900',
-                    color: 'white',
-                    mx: 'auto'
-                }}
-            >
-                <Typography
-                    component="h1"
-                    variant="h4"
-                    sx={{ 
-                        width: '100%', 
-                        fontSize: 'clamp(2rem, 10vw, 2.15rem)', 
-                        mb: 3
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: { xs: 3, md: 5 },
+                        width: '100%',
+                        maxWidth: 400,
+                        backgroundColor: 'grey.900',
+                        color: 'white',
+                        mx: 'auto'
                     }}
                 >
-                    Register
-                </Typography>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                    sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}
-                >
-                    <FormControl>
-                        <TextField
-                            fullWidth
-                            label="Username"
-                            autoComplete="username"
-                            id="username"
-                            value={credentials.username}
-                            disabled={isSubmitted}
-                            onChange={(e) => setCredentials({
-                                ...credentials,
-                                username: e.target.value
-                            })}
-                            error={nameError}
-                            helperText={nameErrorMessage || ' '}
-                            color={nameError ? 'error' : 'primary'}
-                            sx={{
-                                mb: 1,
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiOutlinedInput-root': {
-                                    color: 'white',
-                                    '& fieldset': { borderColor: 'grey.600' },
-                                    '&:hover fieldset': { borderColor: 'grey.400' },
-                                    '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-                                }
-                            }}
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <TextField
-                            fullWidth
-                            id="email"
-                            name="email"
-                            autoComplete="email"
-                            type="email"
-                            label="Email"
-                            variant="outlined"
-                            value={credentials.email}
-                            disabled={isSubmitted}
-                            onChange={(e) => setCredentials({
-                                ...credentials,
-                                email: e.target.value
-                            })}
-                            error={emailError}
-                            helperText={emailErrorMessage || ' '}
-                            color={emailError ? 'error' : 'primary'}
-                            sx={{
-                                mb: 1,
-                                '& .MuiInputLabel-root': { color: 'white' },
-                                '& .MuiOutlinedInput-root': {
-                                    color: 'white',
-                                    '& fieldset': { borderColor: 'grey.600' },
-                                    '&:hover fieldset': { borderColor: 'grey.400' },
-                                    '&.Mui-focused fieldset': { borderColor: 'primary.main' }
-                                }
-                            }}
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <PasswordField
-                            label="Password"
-                            id="password"
-                            name="password"
-                            autoComplete="new-password"
-                            value={credentials.password}
-                            onChange={(value) => setCredentials({
-                                ...credentials,
-                                password: value
-                            })}
-                            disabled={isSubmitted}
-                            error={passwordError}
-                            helperText={passwordErrorMessage || ' '}
-                        />
-                    </FormControl>
-                    <FormControl>
-                        <PasswordField
-                            label="Confirm Password"
-                            id="passwordConfirm"
-                            name="passwordConfirm"
-                            autoComplete="passwordConfirm"
-                            value={credentials.passwordConfirm}
-                            onChange={(value) => setCredentials({
-                                ...credentials,
-                                passwordConfirm: value
-                            })}
-                            disabled={isSubmitted}
-                            error={passwordConfirmError}
-                            helperText={passwordConfirmErrorMessage || ' '}
-                        />
-                    </FormControl>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        disabled={isSubmitted}
-                        sx={{ mt: 3, mb: 3 }}
-                    >
-                        {buttonContent}
-                    </Button>
-                </Box>
-                <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
-                <Typography variant="body2" sx={{ color: 'white', textAlign: 'center' }}>
-                    Already have an account?{' '}
-                    <Link
-                        href="/login"
+                    <Typography
+                        component="h1"
+                        variant="h4"
                         sx={{
-                            color: 'primary.main',
-                            textDecoration: 'underline',
-                            '&:hover': {
-                                color: 'primary.light'
-                            }
+                            width: '100%',
+                            fontSize: 'clamp(2rem, 10vw, 2.15rem)',
+                            mb: 3
                         }}
                     >
-                        Login now
-                    </Link>
-                </Typography>
-            </Paper>
+                        Register
+                    </Typography>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}
+                    >
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                label="Username"
+                                autoComplete="username"
+                                id="username"
+                                value={credentials.username}
+                                disabled={isSubmitted}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    username: e.target.value
+                                })}
+                                error={nameError}
+                                helperText={nameErrorMessage || ' '}
+                                color={nameError ? 'error' : 'primary'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <TextField
+                                fullWidth
+                                id="email"
+                                name="email"
+                                autoComplete="email"
+                                type="email"
+                                label="Email"
+                                variant="outlined"
+                                value={credentials.email}
+                                disabled={isSubmitted}
+                                onChange={(e) => setCredentials({
+                                    ...credentials,
+                                    email: e.target.value
+                                })}
+                                error={emailError}
+                                helperText={emailErrorMessage || ' '}
+                                color={emailError ? 'error' : 'primary'}
+                                sx={{
+                                    mb: 1,
+                                    '& .MuiInputLabel-root': { color: 'white' },
+                                    '& .MuiOutlinedInput-root': {
+                                        color: 'white',
+                                        '& fieldset': { borderColor: 'grey.600' },
+                                        '&:hover fieldset': { borderColor: 'grey.400' },
+                                        '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+                                    }
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <PasswordField
+                                label="Password"
+                                id="password"
+                                name="password"
+                                autoComplete="new-password"
+                                value={credentials.password}
+                                onChange={(value) => setCredentials({
+                                    ...credentials,
+                                    password: value
+                                })}
+                                disabled={isSubmitted}
+                                error={passwordError}
+                                helperText={passwordErrorMessage || ' '}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <PasswordField
+                                label="Confirm Password"
+                                id="passwordConfirm"
+                                name="passwordConfirm"
+                                autoComplete="passwordConfirm"
+                                value={passwordConfirm}
+                                onChange={(value) => setPasswordConfirm(value)}
+                                disabled={isSubmitted}
+                                error={passwordConfirmError}
+                                helperText={passwordConfirmErrorMessage || ' '}
+                            />
+                        </FormControl>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={isSubmitted}
+                            sx={{ mt: 3, mb: 3 }}
+                        >
+                            {buttonContent}
+                        </Button>
+                    </Box>
+                    <Divider sx={{ borderColor: 'grey.600', mb: 3 }} />
+                    <Typography variant="body2" sx={{ color: 'white', textAlign: 'center' }}>
+                        Already have an account?{' '}
+                        <Link
+                            href="/login"
+                            sx={{
+                                color: 'primary.main',
+                                textDecoration: 'underline',
+                                '&:hover': {
+                                    color: 'primary.light'
+                                }
+                            }}
+                        >
+                            Login now
+                        </Link>
+                    </Typography>
+                </Paper>
             </Box>
         </Container>
     )

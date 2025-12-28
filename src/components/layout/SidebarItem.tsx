@@ -1,4 +1,4 @@
-import { faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     Box,
@@ -21,6 +21,7 @@ export default function SidebarItem({ chatviewId, title, isLoading }: SidebarIte
     const isActive = currentlyDisplayedChatView === chatviewId;
 
     const chatView = chatViewCollection.find((chat: ChatView) => chat.id === chatviewId);
+    const isGroupChat = chatView!.userCount < 3 ? false : true;
     const lastMessage = chatView?.messages && chatView.messages.length > 0
         ? chatView.messages[chatView.messages.length - 1]
         : null;
@@ -56,7 +57,7 @@ export default function SidebarItem({ chatviewId, title, isLoading }: SidebarIte
                         py: 1.5,
                     }}
                 >
-                    <FontAwesomeIcon icon={faUsers} size="lg" />
+                    <FontAwesomeIcon icon={isGroupChat ? faUsers : faUser} size="lg" />
                     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>
                             <ListItemText
