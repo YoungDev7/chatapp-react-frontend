@@ -1,3 +1,4 @@
+import { Box, CircularProgress } from '@mui/material';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
@@ -11,7 +12,16 @@ export default function ProtectedRoute({ children }: Props) {
     const { token, isValidating } = useAppSelector(state => state.auth);
 
     if (isValidating) {
-        return <div>Loading...</div>;
+        return (
+            <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="100vh"
+            >
+                <CircularProgress />
+            </Box>
+        );
     }
 
     if (token === null) {
