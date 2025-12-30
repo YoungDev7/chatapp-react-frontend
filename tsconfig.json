@@ -13,6 +13,10 @@
   ],
   "compilerOptions": {
     "jsx": "react",
+    "types": [
+      "jest",
+      "node"
+    ],
     "baseUrl": "src" // Optional: helps resolve absolute paths from 'src'
   },
   "exclude": [

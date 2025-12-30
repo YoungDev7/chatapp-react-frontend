@@ -11,64 +11,76 @@
  * @returns Formatted timestamp string in client's local timezone
  */
 export function formatMessageTimestamp(timestamp: string | number | Date | null | undefined): string {
-  if (!timestamp) {
-    return '';
-  }
-  
   try {
-    let messageDate: Date;
-    
-    // Handle different timestamp formats
-    if (typeof timestamp === 'number') {
-      // Unix timestamp in seconds (multiply by 1000 for milliseconds)
-      messageDate = new Date(timestamp * 1000);
-    } else if (typeof timestamp === 'string') {
-      // ISO 8601 string - Date constructor handles timezone conversion
-      messageDate = new Date(timestamp);
-    } else {
-      // Already a Date object
-      messageDate = timestamp;
-    }
-    
+    let messageDate = parseTimestamp(timestamp);
+
     // Check if date is valid
-    if (!messageDate || isNaN(messageDate.getTime())) {
+    if (!messageDate) {
       return '';
     }
-    
+
+
     // Now in client's local timezone
     const now = new Date();
-    
-    const isToday = 
+
+    const isToday =
       messageDate.getDate() === now.getDate() &&
       messageDate.getMonth() === now.getMonth() &&
       messageDate.getFullYear() === now.getFullYear();
-    
+
     const isSameYear = messageDate.getFullYear() === now.getFullYear();
-    
+
     // Get hours and minutes in client's local timezone
     const hours = messageDate.getHours().toString().padStart(2, '0');
     const minutes = messageDate.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minutes}`;
-    
+
     if (isToday) {
       return timeStr;
     }
-    
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const month = monthNames[messageDate.getMonth()];
     const day = messageDate.getDate();
-    
+
     if (isSameYear) {
       return `${month} ${day}, ${timeStr}`;
     }
-    
+
     const year = messageDate.getFullYear();
     return `${month} ${day}, ${year} ${timeStr}`;
   } catch (error) {
     console.error('Error formatting timestamp:', error, timestamp);
     return '';
   }
+}
+
+export function parseTimestamp(timestamp: string | number | Date | null | undefined): Date | null {
+  if (!timestamp) {
+    return null;
+  }
+
+  let messageDate: Date;
+
+  // Handle different timestamp formats
+  if (typeof timestamp === 'number') {
+    // Unix timestamp in seconds (multiply by 1000 for milliseconds)
+    messageDate = new Date(timestamp * 1000);
+  } else if (typeof timestamp === 'string') {
+    // ISO 8601 string - Date constructor handles timezone conversion
+    messageDate = new Date(timestamp);
+  } else {
+    // Already a Date object
+    messageDate = timestamp;
+  }
+
+  // Validate the date
+  if (isNaN(messageDate.getTime())) {
+    return null;
+  }
+
+  return messageDate;
 }
 
 /**
@@ -80,41 +92,41 @@ export function formatMessageTimestamp(timestamp: string | number | Date | null 
  * @returns true if timestamps are within 1 minute
  */
 export function isWithinOneMinute(
-  timestamp1: string | number | Date | null | undefined, 
+  timestamp1: string | number | Date | null | undefined,
   timestamp2: string | number | Date | null | undefined
 ): boolean {
   // Check for null/undefined before processing
   if (!timestamp1 || !timestamp2) {
     return false;
   }
-  
+
   try {
     let date1: Date;
     let date2: Date;
-    
+
     if (typeof timestamp1 === 'number') {
-      date1 = new Date(timestamp1 * 1000); 
+      date1 = new Date(timestamp1 * 1000);
     } else if (typeof timestamp1 === 'string') {
-      date1 = new Date(timestamp1); 
+      date1 = new Date(timestamp1);
     } else {
-      date1 = timestamp1; 
+      date1 = timestamp1;
     }
-    
+
     if (typeof timestamp2 === 'number') {
-      date2 = new Date(timestamp2 * 1000); 
+      date2 = new Date(timestamp2 * 1000);
     } else if (typeof timestamp2 === 'string') {
       date2 = new Date(timestamp2);
     } else {
-      date2 = timestamp2; 
+      date2 = timestamp2;
     }
-    
+
     if (!date1 || !date2 || isNaN(date1.getTime()) || isNaN(date2.getTime())) {
       return false;
     }
-    
+
     const diffMs = Math.abs(date1.getTime() - date2.getTime());
     const oneMinuteMs = 60 * 1000;
-    
+
     return diffMs < oneMinuteMs;
   } catch (error) {
     console.error('Error comparing timestamps:', error, timestamp1, timestamp2);
@@ -141,16 +153,16 @@ export function shouldShowTimestamp(
   currentSender: string,
   previousSender: string | null
 ): boolean {
-    // Always show for first message
+  // Always show for first message
   if (!previousTimestamp || !previousSender) {
     return true;
   }
-  
+
   // Show if different sender
   if (currentSender !== previousSender) {
     return true;
   }
-  
+
   // Show if more than 1 minute has passed
   return !isWithinOneMinute(currentTimestamp, previousTimestamp);
 }
