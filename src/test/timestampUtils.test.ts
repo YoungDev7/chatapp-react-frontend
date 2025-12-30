@@ -1,11 +1,11 @@
 /// <reference types="jest" />
 /// <reference types="node" />
-import { formatMessageTimestamp } from "./timestampUtils";
+import { formatMessageTimestamp } from "../utils/timestampUtils";
 
 describe('formatMessageTimestamp', () => {
     const currentTimezone = process.env.TZ;
 
-    describe('timezone conversion test', () => {
+    describe('timezone conversion test (hours)', () => {
         //2025-12-29T16:35:18.918Z = 1767026118.918 = 29th December 2025 16:35 UTC 
         //we can use UTC timesamp for all timezones because all related functions such as .getHours() already
         //convert to the right timezone, it doesnt break break functionality that relies on timestampUtils.ts:24
