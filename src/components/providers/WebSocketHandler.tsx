@@ -189,7 +189,7 @@ export default function WebSocketHandler({ children }: { children: ReactNode }) 
                 return;
             }
 
-            const destination = getChatViewWSDestination(chatView.id, user.uid!);
+            const destination = getChatViewWSDestination(chatView.id);
 
             try {
                 const subscription = stompClient.subscribe(destination, (message: { body: string }) => {
