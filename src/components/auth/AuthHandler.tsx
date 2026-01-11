@@ -57,12 +57,12 @@ export default function AuthHandler({ children }: { children: React.ReactNode })
             const originalRequest = error.config;
 
             //TODO: specific server replies should be stored in file as local variables or something like that
-            if (error.response.status === 401 && error.response.data === "Invalid token EXPIRED" && !originalRequest._retry) {
+            if (error.response.status === 401 && error.response.data === "Invalid token EXPIRED" && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
                 originalRequest._retry = true; // Mark as retried before the attempt to prevent infinite loop
 
                 //we send new request to the server to get new access token 
                 try {
-                    const response = await api.post('/auth/refresh', {
+                    const response = await api.post('/auth/refresh', {}, {
                         withCredentials: true // Ensures refresh cookie is sent
                     });
 
