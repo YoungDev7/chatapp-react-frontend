@@ -7,10 +7,11 @@ export const notificationMiddleware: Middleware = (store) => (next) => (action) 
     if (addMessage.match(action)) {
         const state = store.getState();
         const { user } = state.auth;
+        const { currentlyDisplayedChatView } = state.chatView;
         const { id, message } = action.payload;
 
-        // Only notify if message is from someone else
-        if (message.senderName !== user.name) {
+        // Only notify if message is from someone else and user is not viewing this chat
+        if (message.senderUid !== user.uid && currentlyDisplayedChatView !== id) {
             store.dispatch(incrementUnreadCount(id));
 
             const chatView = state.chatView.chatViewCollection.find((cv: { id: string; title: string }) => cv.id === id);

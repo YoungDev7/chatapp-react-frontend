@@ -72,16 +72,7 @@ export default function SidebarItem({ chatviewId, title, isLoading }: SidebarIte
                                     sx: { fontWeight: hasUnread ? 700 : 600 }
                                 }}
                             />
-                            {hasUnread && (
-                                <Box
-                                    sx={{
-                                        width: 8,
-                                        height: 8,
-                                        borderRadius: '50%',
-                                        backgroundColor: '#2196F3'
-                                    }}
-                                />
-                            )}
+
                         </Box>
                         {lastMessage && (
                             <Typography
@@ -99,6 +90,16 @@ export default function SidebarItem({ chatviewId, title, isLoading }: SidebarIte
                             </Typography>
                         )}
                     </Box>
+                    {hasUnread && (
+                        <Box
+                            sx={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                backgroundColor: '#2196F3'
+                            }}
+                        />
+                    )}
                     {isLoading && (
                         <CircularProgress
                             size={20}
