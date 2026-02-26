@@ -290,14 +290,14 @@ The application is containerized and deployed using Docker Compose from the back
 ![Token Refresh Sequence](documentation/flowchart_error_handling.png)
 *Token refresh mechanism*
 
-Additional documentation available in the [backend repository](https://github.com/YoungDev7/chatapp-spring-backend):
+Additional documentation available in the [backend repository](https://github.com/jakubp03/chatapp-spring-backend):
 - Architecture diagrams
 - Sequence diagrams
 - API integration guides
 
 ## 🔗 Related Projects
 
-- [Backend Repository](https://github.com/YoungDev7/chatapp-spring-backend) - Spring Boot backend application
+- [Backend Repository](https://github.com/jakubp03/chatapp-spring-backend) - Spring Boot backend application
 
 ## 📄 License
 
